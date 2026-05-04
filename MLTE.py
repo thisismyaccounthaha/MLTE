@@ -220,7 +220,7 @@ class ToolApp:
             sys.stdout.write("\033[?25h")
             sys.stdout.flush()
 
-#Easter-Egg
+#Easter Egg
 def trigger_rain(app, title):
     import time, random, os, sys
     
@@ -1468,7 +1468,6 @@ def run_update_feature(app, tool_num):
             
         print(f"\n{SUB_COLOR}Press any key to continue...{RESET}")
         readchar.readkey()
-
 
 def save_smart_update(action, tool_num, tool_data, updated_tag, is_cutter_field, target_line=None):
     """
