@@ -220,7 +220,7 @@ class ToolApp:
             sys.stdout.write("\033[?25h")
             sys.stdout.flush()
 
-#Easter Egg
+#Easter--Egg
 def trigger_rain(app, title):
     import time, random, os, sys
     
