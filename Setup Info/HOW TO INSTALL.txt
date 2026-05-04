@@ -1,0 +1,18 @@
+install python3.13 from microsoft store
+ensure all credentials are set to remember for each line's ade shortcut use this example login with alternating serial numbers
+
+
+	Shared Path \\mas-0088\ade
+	user:mas-0088\masmmc
+	pw: masmmc
+
+
+ensure \\shopfloor\backup is permanently set to Z: drive in network drive mapping settings 
+copy MLTE (or MLTE shop floor... requires password to edit tools.) shortcut from this folder to desktop
+click shortcut
+first time running will take a while because it needs to install dependencies. also the most likely reason the program is failing to run
+is dependency version mismatching  
+
+
+
+for support email ethanweaver@tutamail.com or try to get ai to debug errors

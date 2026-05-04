@@ -1,0 +1,402 @@
+{
+    "shop_floor": {
+        "password": "super"
+    },
+    "database_creds": {
+        "uid": "MASUser",
+        "pwd": "M@k1n0User"
+    },
+    "msc_vending": {
+        "user": "Vendingview",
+        "pass": "Vendingview4!",
+        "urls": {
+            "login": "https://vending.mscdirect.com/Account/SignIn/",
+            "portal": "https://portal.vending.mscdirect.com/items/Index",
+            "data": "https://portal.vending.mscdirect.com/Items/GetItems"
+        }
+    },
+    "sync_settings": {
+        "read_only_lines": [
+	        "5axis"
+        ],
+        "priority_order": [
+            "5axis",
+            "Line4",
+            "Line3",
+            "Line5",
+            "Line2",
+            "Line1"
+        ],
+        "column_mapping": {
+            "FTNComment": "Comment",
+            "Type": "Type",
+            "DiameterClass": "DiameterClass",
+            "InterferenceDiameter": "ItfDiameter",
+            "AdaptiveControl": "AcValue",
+            "SpindleLoad": "SlValue",
+            "ThroughSpindleCoolant": "Coolant",
+            "HeavyTool": "Heavy",
+            "ATCSpeed": "AtcSpeed",
+            "PurgeTime": "Purge",
+            "TLAlarmProhibit": "Prohibit",
+            "HolderType": "HolderType",
+            "HolderSize": "HolderSize",
+            "NoRotation": "NoRotation",
+            "BaxisRotProhibit": "BaxisRotProhibit",
+            "OneTouchProhibit": "OneTouchProhibit",
+            "TscRemovalType": "TscRemovalType",
+            "TscFrequency": "TscFrequency",
+            "AxialMaxCuttingLoad": "AxialMaxCuttingLoad",
+            "RadialMaxCuttingLoad": "RadialMaxCuttingLoad",
+            "PwrFlrRetactDisable": "PwrFlrRetactDisable",
+            "MultiPurpose": "MultiPurpose",
+            "VibWarnRapid": "VibWarnRapid",
+            "VibAlarmRapid": "VibAlarmRapid",
+            "VibWarnCutting": "VibWarnCutting",
+            "VibAlarmCutting": "VibAlarmCutting",
+            "TscPressure": "TscPressure",
+            "AlarmStopType": "AlarmStopType",
+            "ATCProhibit": "ProhibitATC",
+            "NoRotationCW": "NoRotationCW",
+            "NoRotationCCW": "NoRotationCCW",
+            "TLSProhibit": "ProhibitTLS",
+            "MeasurementProhibit": "ProhibitMeasurement",
+            "Helix": "Helix",
+            "ImagingAtTCode": "ImagingAtTCode",
+            "AtcSpeedAuto": "AtcSpeedAuto",
+            "BtsPlus": "BtsPlus",
+            "BtsMinus": "BtsMinus",
+            "TscFlowCheckEnable": "TscFlowCheckEnable",
+            "TscFrqSetting": "TscFrqSetting",
+            "ToolMgzVibCtrlMode": "ToolMgzVibCtrlMode",
+            "SeatCheck": "SeatCheck"
+        }
+    },
+    "line_configs": [
+        {
+            "name": "Line1",
+            "ip": "10.10.5.56",
+            "db": "Makino",
+            "path": "C:\\Users\\eweaver\\Desktop\\FTNXML\\Python\\1"
+        },
+        {
+            "name": "Line2",
+            "ip": "10.10.5.55",
+            "db": "Makino",
+            "path": "C:\\Users\\eweaver\\Desktop\\FTNXML\\Python\\2"
+        },
+        {
+            "name": "Line3",
+            "ip": "10.10.5.53",
+            "db": "Makino",
+            "path": "C:\\Users\\eweaver\\Desktop\\FTNXML\\Python\\3"
+        },
+        {
+            "name": "Line4",
+            "ip": "10.10.5.94",
+            "db": "Makino",
+            "path": "C:\\Users\\eweaver\\Desktop\\FTNXML\\Python\\4"
+        },
+        {
+            "name": "Line5",
+            "ip": "192.168.21.77",
+            "db": "Makino",
+            "path": "C:\\Users\\eweaver\\Desktop\\FTNXML\\Python\\5"
+        },
+        {
+            "name": "5axis",
+            "ip": "10.10.5.29",
+            "db": "Makino",
+            "path": "C:\\Users\\eweaver\\Desktop\\FTNXML\\Python\\6"
+        }
+    ],
+    "endmill_sub_types": {
+        "Square Endmill": {
+            "include": [],
+            "exclude": [
+                "BEM",
+                "BALL",
+                "RAD",
+                "R",
+                "DEG",
+                "CH-",
+                "CHAM",
+                "BN",
+                "DA",
+                "UNDERCUT"
+            ]
+        },
+        "Ball Endmill": {
+            "include": [
+                "BEM",
+                "BALL"
+            ],
+            "exclude": []
+        },
+        "Bull Endmill": {
+            "include": [
+                "RAD",
+                "R",
+                "BN"
+            ],
+            "exclude": [
+                "BEM",
+                "BALL"
+            ]
+        },
+        "Chamfer Mill": {
+            "include": [
+                "DEG",
+                "CH-",
+                "CHAM"
+            ],
+            "exclude": []
+        },
+        "Lollipop Mill": {
+            "include": [
+                "LOLI",
+                "POP"
+            ],
+            "exclude": []
+        },
+        "Undercut Mill": {
+            "include": [
+                "DA",
+                "UNDERCUT"
+            ],
+            "exclude": []
+        }
+    },
+    "special_sub_types": {
+        "Corner Rounders": {
+            "include": [
+                "ROUND",
+                "C.R.",
+                "RAD CUTTER",
+                "CONCAVE"
+            ],
+            "exclude": [
+                "LOLLIPOP",
+                "PORT"
+            ]
+        },
+        "Dovetail / Angle": {
+            "include": [
+                "DOVETAIL",
+                "DOVE TAIL",
+                "RAPTOR",
+                "ANGLE EM"
+            ],
+            "exclude": [
+                "DA ",
+                "DBL",
+                "DOUBLE"
+            ]
+        },
+        "DA / Double Angle": {
+            "include": [
+                "DA ",
+                "DBL",
+                "DOUBLE",
+                "T CHAMFER",
+                "UNDERCUT"
+            ],
+            "exclude": [
+                "DOVETAIL"
+            ]
+        },
+        "Lollipops": {
+            "include": [
+                "LOLI",
+                "LOLLIPOP",
+                "BEM"
+            ],
+            "exclude": [
+                "ROUND",
+                "C.R."
+            ]
+        },
+        "Port & Seal": {
+            "include": [
+                "PORT",
+                "O-RING",
+                "SEAL",
+                "AS5202",
+                "J1926"
+            ],
+            "exclude": []
+        },
+        "Trepan / Boring": {
+            "include": [
+                "TREPAN",
+                "HORN",
+                "BORING HEAD"
+            ],
+            "exclude": []
+        },
+        "Form Tools": {
+            "include": [
+                "FORM TOOL",
+                "FORM CUTTER",
+                "JACK HAMMER",
+                "SPOTFACE"
+            ],
+            "exclude": [
+                "DA ",
+                "DBL"
+            ]
+        },
+        "Auxiliary / Shop": {
+            "include": [
+                "FAN",
+                "WASHER",
+                "AIR TUBE",
+                "BRUSH",
+                "BURNISH"
+            ],
+            "exclude": []
+        }
+    },
+    "tap_standard": {
+        "0-80": "0-80",
+        "2-56": "2-56",
+        "4-40": "4-40",
+        "6-32": "6-32",
+        "6-40": "6-40",
+        "8-32": "8-32",
+        "10-24": "10-24",
+        "10-32": "10-32",
+        "1/4-20": "1/4-20",
+        "1/4-28": "1/4-28",
+        "5/16-18": "5/16-18",
+        "5/16-24": "5/16-24",
+        "3/8-16": "3/8-16",
+        "3/8-24": "3/8-24",
+        "7/16-14": "7/16-14",
+        "7/16-20": "7/16-20",
+        "1/2-13": "1/2-13",
+        "3/4-10": "3/4-10"
+    },
+    "tap_metric": {
+        "M1.6": "M1.6",
+        "M2": "M2",
+        "M2.5": "M2.5",
+        "M3": "M3",
+        "M4": "M4",
+        "M5": "M5",
+        "M6": "M6",
+        "M8": "M8",
+        "M10": "M10",
+        "M12": "M12",
+        "M16": "M16",
+        "M29": "M29"
+    },
+    "search_ranges": {
+        "Endmills": [
+            [
+                20,
+                1999
+            ]
+        ],
+        "Inserted Tooling": [
+            [
+                2000,
+                2999
+            ]
+        ],
+        "Spot & Center Drills": [
+            [
+                3000,
+                3999
+            ]
+        ],
+        "Drills": [
+            [
+                4000,
+                4999
+            ]
+        ],
+        "Taps": [
+            [
+                5000,
+                5999
+            ]
+        ],
+        "Boring Bars & Reamers": [
+            [
+                6000,
+                6999
+            ]
+        ],
+        "Woodruff Cutters": [
+            [
+                7000,
+                7999
+            ]
+        ],
+        "Thread Mills": [
+            [
+                8000,
+                8999
+            ]
+        ],
+        "Special Tools": [
+            [
+                9000,
+                9999
+            ]
+        ]
+    },
+    "holder_list": [
+        "3IN SHRINK",
+        "4IN SHRINK",
+        "5IN SHRINK",
+        "6IN SHRINK",
+        "2.5IN PWR SHRINK",
+        "5IN PWR SHRINK",
+        "2.5IN HYD",
+        "4IN HYD",
+        "6IN HYD",
+        "3IN ER11",
+        "4IN ER11",
+        "6IN ER11",
+        "3IN ER16",
+        "4IN ER16",
+        "6IN ER16",
+        "3IN ER20",
+        "4IN ER20",
+        "6IN ER20",
+        "3IN ER32",
+        "4IN ER32",
+        "6IN ER32"
+    ],
+    "tool_kinds": {
+        "End Mill": "3",
+        "Drill": "1",
+        "Ball End Mill": "2",
+        "Reamer": "8",
+        "Tap": "7",
+        "Boring Bar": "4",
+        "Face Mill": "9",
+        "Spring Tool 1": "5",
+        "Spring Tool 2": "6",
+        "Probe ": "10",
+        "Grinding Tool": "11",
+        "Turning Tool": "21"
+    },
+    "tool_types": {
+        "End Mill (EM)": "EM",
+        "Drill (DR)": "DR",
+        "Face Mill (FM)": "FM",
+        "Tap (TP)": "TP",
+        "Boring Bar (BB)": "BB",
+        "Probe (PB)": "PB",
+        "Reamer (RM)": "RM"
+    },
+    "life_types": {
+        "Count": "2",
+        "Distance": "1",
+        "Seconds": "0",
+        "Tenth-seconds": "3"
+    }
+}

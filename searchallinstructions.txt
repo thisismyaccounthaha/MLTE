@@ -1,0 +1,210 @@
+
+--- REGISTERED BRANDS ---
+
+- 3M                            - FANUC AMERICA                 - PARLEC
+- 3M SAFETY                     - FASTENERS (CL CFASTN)         - PH HORN
+- A.B. TOOL                     - FERRAZ SHAWMUT                - PH Horn
+- AB TOOL                       - FULLERTON                     - PHILIPS
+- ACCU-TRAK                     - FULLERTON TOOL CO.            - PHILLIPS
+- ACCUPRO                       - GARR                          - PRECISION TWIST DRILL
+- ACCUPRO (CARBIDE END MILLS)   - GIBRALTAR                     - PRO-SAFE
+- ACCUPRO (MINIATURES)          - GLOBAL CNC INDUSTRIES         - PROMAX
+- ACCUPRO HI-PERF. DRILLS       - GOJO INDUSTRIES               - PYRAMEX
+- ACCURATE                      - GREENFIELD TAP & DIE          - PYRAMEX SAFETY PRODUCTS
+- ALLIED                        - GUHRING                       - Production Automation Corp.
+- ALLIED MACHINE                - GUHRING INC                   - RAPTOR WORKHOLDING
+- ALVORD POLK                   - GUHRING TIN COATED 4.0MM      - RED LINE
+- ARCH                          - GW SCHULTZ                    - REDLINE
+- ARCH CORP                     - GW SCHULZ                     - REDLINE TOOLS
+- ARNO                          - GWS TOOL GROUP                - REIFF & NESTOR
+- ARNO-WERKZEUGE USA LLC        - GWS-GROUP - MONSTER           - RENISHAW
+- ATA TOOLS                     - Gardner Spring                - RICHARDS
+- ATRAX                         - Gibraltar                     - ROBB JACK
+- Accurate                      - Global                        - ROBB-JACK
+- Acme                          - Guhring                       - ROCK RIVER
+- Arno                          - HANITA                        - ROCK RIVER TOOL
+- Arno Rouse USA                - HARDINGE                      - ROCKFORD COMMERCIAL WHSE
+- BALAX                         - HARDINGE(COLLETS/WORKHOLDING) - ROYAL PRODUCTS
+- BAUSCH & LOMB                 - HARVEY                        - Rayovac
+- BIG DAISHOWA                  - HARVEY PERF                   - RedLine Tools
+- BRIGHTON BEST                 - HARVEY PERF - HARVEY          - Redline Tools
+- BRIGHTON BEST INT'L           - HARVEY PERF - HELICAL         - SANDVIK
+- BRIGHTON-BEST SOCKET SCREW    - HARVEY PERF - TITAN           - SANDVIK COROMANT
+- BULBTRONICS                   - HARVEY TOOL                   - SANVIK
+- CARMEX                        - HASSAY-SAVAGE                 - SCIENTIFIC CUTTING TOOLS
+- CARR LANE                     - HELI-COIL                     - SCT
+- CARR LANE MANUFACTURING CO    - HELICAL                       - SECO
+- CARR-LANE                     - HELICAL SOLUTION              - SECO TOOLS ( NIAGARA )
+- CASTROL                       - HELICAL SOLUTIONS             - SECO TOOLS INC
+- CEC INDUSTRIES LTD            - HELICOIL                      - SEVERANCE TOOL
+- CEJN                          - HERTEL                        - SGS
+- CERATIP                       - HERTEL (GP END MILLS)         - SGS PRO
+- CERATIZIT                     - HERTEL (MT)                   - SOUTHWICK & MEISTER
+- CGS                           - HERTEL CARBIDE BURR           - SPIRALOCK CORP
+- CHICAGO LATROBE               - HERTEL REAMERS                - SPIRALOCK CORPORATION
+- CHICK WORKHOLDING             - HERTEL REAMERS (APO)          - STANDARD ABRASIVES
+- CHICK WORKHOLDING SOLUTIONS   - HODELL-NATCO INDUSTRIES       - STAR STAINLESS SCREW CO.
+- CLEVELAND                     - HOLO KROME                    - STARRETT
+- CNC SPECIALTIES               - HOLO KROME CO                 - SUMITOMO
+- COMMAND TOOLING SYSTEMS       - HOLO KROME CO.                - SUMITOMO ELECTRIC
+- CRAFTSMAN                     - HOLO-KROME                    - SWIFT CARB
+- CROWN                         - HOLOKROME                     - SYLVANIA
+- Carmax                        - HONEYWELL SAFETY PRODUCTS     - Sandvik
+- Carmex                        - HONEYWELL SAFETY USA          - Seco
+- DATA FLUTE CNC                - HORN                          - Slater Tools
+- DORIAN TOOL                   - HORN USA                      - TECHNIKS
+- DORMER PRAMET                 - HTC TOOL                      - TITAN
+- DORMER TOOLS LLC.             - Hardinge                      - TITAN USA
+- DURACELL                      - Harvey Tool                   - TITEX
+- DYKEM                         - Helical Solutions             - TONG MING ENTERPRISE CO.
+- DYNALON LABWARE               - Hertel                        - TOOL-FLO MANUFACTURING
+- Dyna Comp Inc.                - Holo-Krome                    - TRIANGLE
+- EMUGE                         - IMCO                          - TRIANGLE PERCISION
+- ENERGIZER                     - INFASTECH DECORAH (CAMCAR)    - TRIANGLE PRECISION REAMERS
+- ENERGY PLUS                   - INGERSOLL                     - TRIANGLE REAMER CO
+- ENERGYPLUS                    - INGERSOLL CUTTING TOOLS       - TRU-MAXX
+- FANG SHENG SCREW CO.          - INTERNAL TOOL                 - TUNGALOY
+- ITPSTYLI, LLC                 - INTERSTATE                    - TUNGALOY AMERICA
+- Internal Tool                 - INTERSTATE THREADING          - TUNGALOY NTK AMERICA
+- Internal Tool Inc             - ISCAR                         - Titan USA
+- Iscar                         - ISCAR METALS                  - Tungaloy
+- JEWELL TOOL                   - ISCAR METALS INC              - UNBRAKO
+- KAISER                        - LNS AMERCIA                   - UNBRAKO LLC
+- KAISER THIN BIT               - LUMBERTON INDUSTRIES          - VALUE COLLECTION
+- KENNAMENTAL                   - M.A. FORD                     - VARGUS
+- KENNAMETAL                    - M.A.FORD                      - VERTEX DISTRIBUTION
+- KENNAMETAL (HOLEMAKING)       - M.A.FORD MFG.CO.,INC.         - VNE Corp
+- KENNAMETAL (INDEXABLE)        - MA FORD                       - Value Collection
+- KENNAMETAL (SC END MILLS)     - MADE IN THE USA               - WALTER
+- KENNAMETAL (THREADING)        - MADE IN USA                   - WALTER TITEX
+- KEO                           - MAGAFOR                       - WALTER-TITEX
+- KERR-LAKESIDE INC             - MAGID GLOVE AND SAFETY        - WALTER-TITEX REGRIND
+- KERR-LAKESIDE INC.            - MCR SAFETY                    - WALTER-VALENITE
+- KOMET                         - MEDIQUE                       - WEILER CO
+- KYOCERA                       - MEDIQUE PRODUCTS              - WELDON
+- KYOCEREA                      - MELIN                         - WHITNEY TOOL
+- Kaiser                        - MERIT                         - WIDIA
+- Kennametal                    - METAL REMOVAL                 - Walter-Titex
+- Komet                         - MICHIGAN DRILL                - Whizcut
+- Kyocera                       - MICRO 100                     - Widia
+- LIXIE                         - MICROFLEX                     - XACTFORM USA
+- LMT                           - MITEE-BITE                    - XACTFORM USA, INC
+- MITGI                         - OSG                           - YANKEE
+- MITSUBISHI                    - OSG EXO-DRILLS                - YANKEE CORP
+- MITSUBISHI MATERIALS USA      - OSG INC. (EXO-TAPS)           - YANKEE CORP.
+- MITSUBISHI-HITACHI            - OSRAM SYLVANIA                - YANKEE CORPORATION
+- MULE                          - PANASONIC                     - YG-1
+- McMaster-Carr                 - NEW TECH                      - YMW
+- Mitsubishi                    - NEW TECH - SWIFT CARB         - Yankee
+- NACHI                         - NEW TECH CUTTING TOOLS        - hertel
+- NIAGARA                       - NEW TECH-SWIFT CARB           - seco
+- NICHOLSON                     - NOGA
+- NICOLSON                      - NOGA ENGINEERING
+- NORTON                        - NORTON CO
+- OMRON                         - OSBORN
+
+============================================================
+             ^^^^ TOOL CRIB BRANDS ^^^^
+============================================================
+
+[ABRASIVE]                        [END MILL]
+   > 9X11 SHEETS                     > 2 FLUTE                      [MAZAK]
+   > BELT                            > 3 FLUTE                         > DRILLS
+   > BRUSH                           > 4 FLUTE                         > ENDMILLS
+   > DISC PAD                        > 5 FLUTE                         > INSERTS
+   > DRESSERS                        > 6 FLUTE
+   > FILE                            > 7 FLUTE                      [MILLING]
+   > HAND PAD                        > BALL END 2 FLT                  > CUTTER BODY
+   > SHOP ROLLS                      > BALL END 3 FLT                  > INSERT
+   > STONE                           > BALL END 4 FLT
+   > WHEEL                           > BALL END 6 FLT               [NO CATEGORY]
+                                     > CHMF MILL
+[B-20]                               > ENGRAVING                    [REAMER]
+   > CUT / GROOVE                    > HARVEY END MILL                 > CARBIDE
+                                     > HIGH FEED MILL                  > HSS
+[BORE]                               > HIGH HELIX 2 FLT
+                                     > HIGH HELIX 3 FLT             [SAFETY]
+[BORING BARS]                        > RADIUS
+   > INSERTED                        > ROUGHING                     [SAFETY COMMITTEE]
+   > SOLID
+                                  [FASTENERS]                       [SPARE PARTS]
+[CELL CUP TOOLING]                   > BUTTON H. SCREW
+                                     > DOWELL PINS                  [SPECIALS]
+[CHEMICALS]                          > FLAT H. SCREW
+                                     > HEX HD CAP SCREW             [Security]
+[COUNTERSINK]                        > LOCK WASHER                     > ZEISS
+                                     > LOW HEAD CAP SCREW
+[DEBUR]                              > MACHINE SCREWS               [TALON]
+   > CARB BUR                        > NUTS
+   > HANDLES                         > SET SCREWS                   [TAPS]
+   > HOLDER                          > SHOULDER BOLT                   > STI
+   > OUTSIDE CHMF                    > SO. H. CAP SCREW
+   > ROTO DEBURR TOOLS               > SPRING PIN                   [THIN BITS]
+   > SCRAPER                         > WASHERS
+                                                                    [THREADING]
+[DISC'S]                          [FIXTURE -SET UP ITEMS]              > BOTTOM
+                                                                       > EXTENSION
+[DRILL]                           [HOLDER]                             > FORM TAP
+   > CARBIDE FRACTION                > CUTOFF                          > GUN TAP
+   > CARBIDE LETTER                                                    > HELICOIL TAP
+   > CARBIDE METRIC               [INSERT SCREWS]                      > HIGH SPIRAL TAP
+   > CARBIDE NUMBER                                                    > MANDREL
+   > CENTER DRILL                 [INSERTS]                            > METRIC TAP
+   > CIRCUIT BOARD                   > GROOVING                        > SPIRALOK TAP
+   > COBALT                          > MILLING TIP                     > TAPER PIPE
+   > COOLANT THRU                    > THREADING                       > THREAD MILL
+   > HSS AIRCRAFT                    > TURNING
+   > HSS JOBBER FRACTION                                            [TURNING]
+   > HSS JOBBER LETTER            [KITS]                               > BROACH
+   > HSS JOBBER METRIC                                                 > CUTOFF
+   > HSS JOBBER NUMBER            [KNURLING]                           > DRILL INSERT
+   > HSS SCREW FRAC                                                    > E-COLLET
+   > HSS SCREW LETTER             [MAINTENANCE]                        > FINISHING
+   > HSS SCREW NUMBER                > BATTERY                         > GROOVING
+   > JOBBER                          > BULB                            > PROFILING
+   > PARABOLIC                       > FUSE                            > ROUGH - FINISH
+   > SPOT DRILL                      > HAMMER HEAD                     > ROUGHING
+   > TAPER                           > PAPER TOWELS                    > THREADING
+                                     > PROBE                           > TRIGON
+[DRILLS INDEXABLE]                   > RENI BODY
+                                     > STARTER
+
+============================================================
+        ^^^^ TOOL CRIB DATABASE REFERENCE ^^^^
+============================================================
+
+The 'SEARCH ALL' mode is a live, stackable filtering system. 
+When you enter this mode, you see the entire inventory 
+immediately. Use the following tools to find your items.
+
+- NO QUOTES: Treats your input as one exact phrase.
+  * Example: [S] HELICAL SOLUTIONS 
+    (Looks for that exact brand name)
+- WITH QUOTES: Activates "OR" logic between terms.
+  * Example: [S] "END MILL" "DRILL"
+    (Shows all End Mills OR all Drills)
+
+REFINING (THE "AND" OPERATION)
+---------------------------------
+To narrow results down, apply filters one at a time:
+  1. [S] "END MILL" "DRILL"  -> (Shows both categories)
+  2. [S] .250                -> (Narrows that list to only 1/4")
+  3. [S] HARVEY              -> (Narrows further to only Harvey)
+
+NEGATIVE SEARCH (EXCLUDE)
+----------------------------
+Use the [E] key to filter out the "noise."
+- Example: If your search for Drills shows too many Spot Drills, 
+  press [E] and type: SPOT
+- Example: Press [E] and type: "MOVED" 
+  (To hide outdated or tagged inventory)
+
+TIPS:
+- WATCH THE PATH: The 'SEARCH PATH' at the top of the screen 
+  tracks every filter applied (e.g., SEARCH ALL > DRILL > NOT SPOT).
+- STACK FILTERS: You can [S] Include a brand, then [E] Exclude 
+  a size, then [S] Include a flute number to find a specific tool.
+
+============================================================
+    ^^^^ TOOL CRIB - SEARCH ALL INSTRUCTIONS ^^^^
+============================================================
