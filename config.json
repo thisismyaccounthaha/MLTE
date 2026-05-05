@@ -77,37 +77,37 @@
             "name": "Line1",
             "ip": "10.10.5.56",
             "db": "Makino",
-            "path": "C:\\Users\\eweaver\\Desktop\\FTNXML\\Python\\1"
+            "path": "C:\\Users\\eweaver\\Documents\\PythonProjects\\MLTE\\1"
         },
         {
             "name": "Line2",
             "ip": "10.10.5.55",
             "db": "Makino",
-            "path": "C:\\Users\\eweaver\\Desktop\\FTNXML\\Python\\2"
+            "path": "C:\\Users\\eweaver\\Documents\\PythonProjects\\MLTE\\2"
         },
         {
             "name": "Line3",
             "ip": "10.10.5.53",
             "db": "Makino",
-            "path": "C:\\Users\\eweaver\\Desktop\\FTNXML\\Python\\3"
+            "path": "C:\\Users\\eweaver\\Documents\\PythonProjects\\MLTE\\3"
         },
         {
             "name": "Line4",
             "ip": "10.10.5.94",
             "db": "Makino",
-            "path": "C:\\Users\\eweaver\\Desktop\\FTNXML\\Python\\4"
+            "path": "C:\\Users\\eweaver\\Documents\\PythonProjects\\MLTE\\4"
         },
         {
             "name": "Line5",
             "ip": "192.168.21.77",
             "db": "Makino",
-            "path": "C:\\Users\\eweaver\\Desktop\\FTNXML\\Python\\5"
+            "path": "C:\\Users\\eweaver\\Documents\\PythonProjects\\MLTE\\5"
         },
         {
             "name": "5axis",
             "ip": "10.10.5.29",
             "db": "Makino",
-            "path": "C:\\Users\\eweaver\\Desktop\\FTNXML\\Python\\6"
+            "path": "C:\\Users\\eweaver\\Documents\\PythonProjects\\MLTE\\6"
         }
     ],
     "endmill_sub_types": {

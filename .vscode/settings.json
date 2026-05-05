@@ -1,0 +1,10 @@
+{
+    "python-envs.defaultEnvManager": "ms-python.python:system",
+    "terminal.integrated.profiles.windows": {
+        "PowerShell": {
+            "source": "PowerShell",
+            "args": ["-NoExit", "-Command", "& 'c:\\Users\\eweaver\\Documents\\PythonProjects\\MLTE\\venv\\Scripts\\Activate.ps1'"]
+        }
+    },
+    "terminal.integrated.defaultProfile.windows": "PowerShell"
+}
