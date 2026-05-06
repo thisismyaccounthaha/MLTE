@@ -257,6 +257,99 @@
             "exclude": []
         }
     },
+    "toolCribSearchAliasList": [
+        {
+            "name": "Square Endmill",
+            "word_syns": ["endmill", "end mill", "mill", "em", "e.m."],
+            "part_syns": ["sem", "eml", "sqr end", "square end", "flat end", "e.m."],
+            "alias_exclude": ["item", "system", "them", "email", "dykem"],
+            "hard_exclude": ["ball", "b.e.m.", "insert", "engraving", "extension", "lab", "tpi", "chmfr", "assembly", "chmf", "bn", "bastard", "radius", "rad", "c.r.", "cr", "corner", "bullnose", "chamfer", "chf", "tap", "lollipop", "thread"]
+        },
+        {
+            "name": "Ball Mill",
+            "word_syns": ["ballmill", "ball mill", "ballnose", "ball", "ballendmill"],
+            "part_syns": [],
+            "alias_exclude": [],
+            "hard_exclude": ["square", "flat", "tpi", "sqr", "corner radius", "c.r.", "corner rounding", "reamer", "bearing", "bearings", "bur", "moved"]
+        },
+        {
+            "name": "Bull Mill",
+            "word_syns": ["corner radius", "cr", "c.r.", "bullnose", "bull nose", "radius end", "bullmill"],
+            "part_syns": ["rad em", "bn"],
+            "alias_exclude": ["screw", "craft", "crane", "creek"],
+            "hard_exclude": ["ball", "square", "flat", "pilot", "corner rounding", "tpi", "undercutting"]
+        },
+        {
+            "name": "Drills",
+            "word_syns": ["drill", "drilling", "jobber", "stub drill", "micro drill", "carbide drill", "130d", "118d", "135d", "para drill", "cool thru drill", "guhr", "screw mach drl"],
+            "part_syns": ["drl"],
+            "alias_exclude": [],
+            "hard_exclude": ["tap", "threadmill", "tm", "reams", "reamer", "spot", "drill mill", "chf", "chamf", "chamfer", "countersink", "csink", "ctrsnk"]
+        },
+        {
+            "name": "Taps",
+            "word_syns": ["tap", "tapping", "thread tap", "spiral tap", "plug tap", "btm tap", "form tap", "roll form", "sti tap", "sp pt", "sp flt", "exotap"],
+            "part_syns": [],
+            "alias_exclude": ["tape", "taper", "tapered"],
+            "hard_exclude": ["drill", "thread mill", "tm", "debur"]
+        },
+        {
+            "name": "Thread Mills",
+            "word_syns": ["threadmill", "thread mill", "tm", "t.m.", "pitch mill", "thrd mill", "thrd. mill", "th. mill", "th mill", "thrd tool", "thread tool", "threadmill"],
+            "part_syns": [],
+            "alias_exclude": ["atm", "platform", "html", "stme", "time"],
+            "hard_exclude": ["drill", "tap"]
+        },
+        {
+            "name": "Chamfer Mills",
+            "word_syns": ["chamfer", "cmf", "chamf", "chmf", "chamfer mill", "chf", "back chamfer", "drill mill,"],
+            "part_syns": [],
+            "alias_exclude": ["chef"],
+            "hard_exclude": ["square", "flat", "ball", "drill", "debur", "tap", "insert", "hldr"]
+        },
+        {
+            "name": "Countersinks",
+            "word_syns": ["countersink", "csink", "ctrsnk", "counter sink", "c'sink", "sf hss c'sink", "6fl hss c'sink", "uniflute"],
+            "part_syns": [],
+            "alias_exclude": ["sink"],
+            "hard_exclude": ["drill", "endmill"]
+        },
+        {
+            "name": "Spot / Center Drills",
+            "word_syns": ["spot drill", "spotting drill", "center drill", "spotdrill", "spot", "cb nc", "spotting"],
+            "part_syns": [],
+            "alias_exclude": ["transport", "hotspot"],
+            "hard_exclude": ["jobber", "long length", "tap"]
+        },
+        {
+            "name": "Lollipop / Undercut",
+            "word_syns": ["undercut", "lollipop", "270 deg", "double angle", "spherical mill"],
+            "part_syns": [],
+            "alias_exclude": [],
+            "hard_exclude": ["square", "drill"]
+        },
+        {
+            "name": "Reamers",
+            "word_syns": ["reams", "reamer", "chucking reamer", "hss reamer", "carbide reamer"],
+            "part_syns": ["rmr"],
+            "alias_exclude": ["armor", "warm"],
+            "hard_exclude": ["drill", "tap", "port"]
+        },
+        {
+            "name": "Keyseat / Woodruff",
+            "word_syns": ["woodruff", "keyseat", "key seat", "slot mill", "t-slot", "woody", "key"],
+            "part_syns": [],
+            "alias_exclude": [],
+            "hard_exclude": ["endmill", "drill"]
+        },
+        {
+            "name": "SEARCH ALL",
+            "word_syns": [],
+            "part_syns": [],
+            "alias_exclude": [],
+            "hard_exclude": []
+        }
+    ],
     "tap_standard": {
         "0-80": "0-80",
         "2-56": "2-56",

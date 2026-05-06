@@ -7,105 +7,44 @@ import readchar
 import shutil
 from readchar import key as rc_key
 
+from MLTE import *
+from settings import cfg
+
 C_HDR, C_ITEM, C_DESC, C_ALIAS, C_RESET = "\033[1;36m", "\033[1;33m", "\033[1;37m", "\033[1;32m", "\033[0m"
 C_DEBUG = "\033[1;31m" # Red for debug visibility
 
 # -------------------------------
 # EXTENSIVE SYNONYM SYSTEM
 # -------------------------------
-ALIAS_GROUPS = [
-    {
-        "name": "Square Endmill",
-        "word_syns": {"endmill", "end mill", "mill", "em", "e.m."},
-        "part_syns": {"sem", "eml", "sqr end", "square end", "flat end", "e.m."},
-        "alias_exclude": {"item", "system", "them", "email", "dykem"},
-        "hard_exclude": {"ball", "tpi", "chmfr", "bn", "radius", "rad", "c.r.", "cr", "corner", "bullnose", "chamfer", "chf", "tap", "lollipop"}
-    },
-    {
-        "name": "Ball Mill",
-        "word_syns": {"ballmill", "ball mill", "ballnose", "ball", "ballendmill"},
-        "part_syns": set(),
-        "alias_exclude": set(),
-        "hard_exclude": {"square", "flat", "tpi", "sqr", "corner radius", "c.r.", "corner rounding", "reamer", "bearing", "bearings", "bur", "moved"}
-    },
-    {
-        "name": "Bull Mill",
-        "word_syns": {"corner radius", "cr", "c.r.", "bullnose", "bull nose", "radius end", "bullmill"},
-        "part_syns": {"rad em", "bn"},
-        "alias_exclude": {"screw", "craft", "crane", "creek"},
-        "hard_exclude": {"ball", "square", "flat", "pilot", "corner rounding", "tpi", "undercutting"}
-    },
-    {
-        "name": "Drills",
-        "word_syns": {"drill", "drilling", "jobber", "stub drill", "micro drill", "carbide drill", "130d", "118d", "135d", "para drill", "cool thru drill", "guhr", "screw mach drl"},
-        "part_syns": {"drl"},
-        "alias_exclude": set(),
-        "hard_exclude": {"tap", "threadmill", "tm", "reams", "reamer", "spot", "drill mill", "chf", "chamf", "chamfer", "countersink", "csink", "ctrsnk"}
-    },
-    {
-        "name": "Taps",
-        "word_syns": {"tap", "tapping", "thread tap", "spiral tap", "plug tap", "btm tap", "form tap", "roll form", "sti tap", "sp pt", "sp flt", "exotap"},
-        "part_syns": set(),
-        "alias_exclude": {"tape", "taper", "tapered"},
-        "hard_exclude": {"drill", "thread mill", "tm", "debur"}
-    },
-    {
-        "name": "Thread Mills",
-        "word_syns": {"threadmill", "thread mill", "tm", "t.m.", "pitch mill", "thrd mill", "thrd. mill", "th. mill", "th mill", "thrd tool", "thread tool", "threadmill"},
-        "part_syns": set(),
-        "alias_exclude": {"atm", "platform", "html", "stme", "time"},
-        "hard_exclude": {"drill", "tap"}
-    },
-    {
-        "name": "Chamfer Mills",
-        "word_syns": {"chamfer", "cmf", "chamf", "chmf", "chamfer mill", "chf", "back chamfer", "drill mill,"},
-        "part_syns": set(),
-        "alias_exclude": {"chef"},
-        "hard_exclude": {"square", "flat", "ball", "drill", "debur", "tap"}
-    },
-    {
-        "name": "Countersinks",
-        "word_syns": {"countersink", "csink", "ctrsnk", "counter sink", "c'sink", "sf hss c'sink", "6fl hss c'sink", "uniflute"},
-        "part_syns": set(),
-        "alias_exclude": {"sink"},
-        "hard_exclude": {"drill", "endmill"}
-    },
-    {
-        "name": "Spot / Center Drills",
-        "word_syns": {"spot drill", "spotting drill", "center drill", "spotdrill", "spot", "cb nc", "spotting"},
-        "part_syns": set(),
-        "alias_exclude": {"transport", "hotspot"},
-        "hard_exclude": {"jobber", "long length", "tap"}
-    },
-    {
-        "name": "Lollipop / Undercut",
-        "word_syns": {"undercut", "lollipop", "270 deg", "double angle", "spherical mill"},
-        "part_syns": set(),
-        "alias_exclude": set(),
-        "hard_exclude": {"square", "drill"}
-    },
-    {
-        "name": "Reamers",
-        "word_syns": {"reams", "reamer", "chucking reamer", "hss reamer", "carbide reamer"},
-        "part_syns": {"rmr"},
-        "alias_exclude": {"armor", "warm"},
-        "hard_exclude": {"drill", "tap"}
-    },
-    {
-        "name": "Keyseat / Woodruff",
-        "word_syns": {"woodruff", "keyseat", "key seat", "slot mill", "t-slot", "woody", "key"},
-        "part_syns": set(),
-        "alias_exclude": set(),
-        "hard_exclude": {"endmill", "drill"}
-    },
-    {
-        "name": "SEARCH ALL",
-        "word_syns": set(),
-        "part_syns": set(),
-        "alias_exclude": set(),
-        "hard_exclude": set()
-    }
-]
+TOOL_CRIB_SEARCH_ALIAS_LIST = cfg.toolCribSearchAliasList
+
+
+GAUGE_CONSTANTS = {
+    # Wire Gauges
+    "80": 0.0135, "79": 0.0145, "78": 0.0160, "77": 0.0180, "76": 0.0200,
+    "75": 0.0210, "74": 0.0225, "73": 0.0240, "72": 0.0250, "71": 0.0260,
+    "70": 0.0280, "69": 0.0292, "68": 0.0310, "67": 0.0320, "66": 0.0330,
+    "65": 0.0350, "64": 0.0360, "63": 0.0370, "62": 0.0380, "61": 0.0390,
+    "60": 0.0400, "59": 0.0410, "58": 0.0420, "57": 0.0430, "56": 0.0465,
+    "55": 0.0520, "54": 0.0550, "53": 0.0595, "52": 0.0635, "51": 0.0670,
+    "50": 0.0700, "49": 0.0730, "48": 0.0760, "47": 0.0785, "46": 0.0810,
+    "45": 0.0820, "44": 0.0860, "43": 0.0890, "42": 0.0935, "41": 0.0960,
+    "40": 0.0980, "39": 0.0995, "38": 0.1015, "37": 0.1040, "36": 0.1065,
+    "35": 0.1100, "34": 0.1110, "33": 0.1130, "32": 0.1160, "31": 0.1200,
+    "30": 0.1285, "29": 0.1360, "28": 0.1405, "27": 0.1440, "26": 0.1470,
+    "25": 0.1495, "24": 0.1520, "23": 0.1540, "22": 0.1570, "21": 0.1590,
+    "20": 0.1610, "19": 0.1660, "18": 0.1695, "17": 0.1730, "16": 0.1770,
+    "15": 0.1800, "14": 0.1820, "13": 0.1850, "12": 0.1890, "11": 0.1910,
+    "10": 0.1935, "9": 0.1960, "8": 0.1990, "7": 0.2010, "6": 0.2040,
+    "5": 0.2055, "4": 0.2090, "3": 0.2130, "2": 0.2210, "1": 0.2280,
+
+    # Letter Gauges
+    "A": 0.2340, "B": 0.2380, "C": 0.2420, "D": 0.2460, "E": 0.2500, "F": 0.2570,
+    "G": 0.2610, "H": 0.2660, "I": 0.2720, "J": 0.2770, "K": 0.2810, "L": 0.2900,
+    "M": 0.2950, "N": 0.3020, "O": 0.3160, "P": 0.3230, "Q": 0.3320, "R": 0.3390,
+    "S": 0.3480, "T": 0.3580, "U": 0.3680, "V": 0.3770, "W": 0.3860, "X": 0.3970,
+    "Y": 0.4040, "Z": 0.4130,
+}
 
 class ToolSearcher:
     def __init__(self, db_path):
@@ -141,38 +80,80 @@ class ToolSearcher:
     def parse_size(self, text):
         if not text: return None
         try:
-            text = text.lower().strip()
+            # Clean string: handle European commas and remove gauge prefixes (#, No.)
+            s = text.lower().strip().replace(',', '.')
+            s = re.sub(r'(no\.|#|num|gauge)\s*', '', s)
             
-            # Handle Metric (mm) conversion
-            if "mm" in text or (text.endswith("m") and not text.endswith("em")):
-                clean_val = text.replace("mm", "").replace("m", "").strip()
-                # Convert mm to inches: mm / 25.4
-                return round(float(clean_val) / 25.4, 4)
+            # 1. Lookup Gauges/Letters first
+            if s.upper() in GAUGE_CONSTANTS:
+                return GAUGE_CONSTANTS[s.upper()]
+
+            # 2. Mathematical Fraction Handling (e.g., 1/4 -> 0.25)
+            if "/" in s:
+                n, d = s.split("/")
+                return float(n) / float(d)
             
-            # Handle Fractions
-            if "/" in text:
-                n, d = text.split("/")
-                return round(float(n)/float(d), 4)
+            # 3. Mathematical Metric Handling (e.g., 5.5mm -> 0.2165)
+            if "mm" in s or (s.endswith("m") and not s.endswith("em")):
+                clean_val = s.replace("mm", "").replace("m", "").strip()
+                return float(clean_val) / 25.4
             
-            # Handle Standard Decimals
-            return round(float(text), 4)
+            # 4. Standard Decimal (e.g., 0.5)
+            val = float(s)
+            
+            # 5. Smart Metric Detection: 
+            # If the value looks like a standard metric drill (e.g., 5.5, 6.75) 
+            # but doesn't have 'mm', your search logic below will handle it via the +-0.005 check.
+            return val
         except: 
             return None
 
     def extract_size(self, text):
-        # Updated Regex to catch patterns like "10mm", "6.5mm", or "1/4"
-        # Now includes optional 'mm' at the end of the digit group
-        match = re.search(r'(\d+/\d+|\d*\.\d+|\d+)\s*(mm|m)?', text.lower())
-        if match:
-            # Reconstruct the string (e.g., "10" + "mm") to pass to parse_size
-            full_val = match.group(1) + (match.group(2) if match.group(2) else "")
-            return self.parse_size(full_val)
+        if not text: return None
+        # 1. Standardize
+        s = text.lower().strip().replace(',', '.')
+        
+        # 2. Split at 'X'. We use a regex split to catch '1/2X2' or '1/2 X 2'
+        # This ensures 'head' is ONLY the first part (the diameter)
+        parts = re.split(r'\s*x\s*', s)
+        head = parts[0] if parts else s
+    
+        # 3. PRIORITY 1: Fractions (e.g., 1/2)
+        # We look for a fraction anywhere in that first segment
+        frac_match = re.search(r'(\d+/\d+)', head)
+        if frac_match:
+            try:
+                n, d = frac_match.group(1).split('/')
+                return float(n) / float(d)
+            except: pass
+    
+        # 4. PRIORITY 2: Gauges/Letters (e.g., #3, No. 3, Letter E)
+        gauge_match = re.search(r'(?:#|no\.|size|letter)\s*([a-z0-9]+)', head)
+        if gauge_match:
+            val = gauge_match.group(1).upper()
+            if val in GAUGE_CONSTANTS:
+                return GAUGE_CONSTANTS[val]
+    
+        # 5. PRIORITY 3: Metric (e.g., 3.1mm)
+        metric_match = re.search(r'(\d*\.\d+|\d+)\s*mm', head)
+        if metric_match:
+            return float(metric_match.group(1)) / 25.4
+    
+        # 6. PRIORITY 4: Decimals (e.g., .5, 0.5, .122)
+        # This regex looks for:
+        # Option A: A dot followed by 1-4 digits (.5, .122)
+        # Option B: A leading digit, then a dot, then 1-4 digits (0.5, 1.25)
+        decimal_match = re.search(r'(\.\d{1,4})|(\d\.\d{1,4})', head)
+        if decimal_match:
+            # group(0) returns the full matched string (e.g., ".5")
+            return float(decimal_match.group(0))
+    
         return None
 
     def filtered_search(self, cat_name, diam_val, keywords, source_set=None, dynamic_regex=None):
         dataset = source_set if source_set is not None else self.data
         cat_name_std = str(cat_name).upper() 
-        group_meta = next((g for g in ALIAS_GROUPS if g["name"].upper() == cat_name_std), None)
+        group_meta = next((g for g in TOOL_CRIB_SEARCH_ALIAS_LIST if g["name"].upper() == cat_name_std), None)
         
         results = []
         search_query = str(keywords).lower() if keywords else ""
@@ -240,17 +221,37 @@ class ToolSearcher:
             if diam_val is not None:
                 item_size_inch = self.extract_size(desc)
                 
-                # Check 1: Direct match (e.g., 0.5 == 0.5)
-                if item_size_inch == diam_val:
-                    pass # Match found
-                
-                # Check 2: Metric fallback 
-                # If user typed '5.5', check if the tool is 5.5mm (0.2165")
-                elif round(diam_val / 25.4, 4) == item_size_inch:
-                    pass # Match found (User typed MM value without suffix)
-                
+                if item_size_inch is not None:
+                    # 1. REAMER LOGIC: Strict +/- 0.0005
+                    if cat_name_std == "REAMERS":
+                        if abs(item_size_inch - diam_val) <= 0.0005:
+                            pass # Match
+                        else:
+                            continue
+
+                    # 2. DRILL LOGIC: Similarity Bridge +/- 0.005
+                    elif cat_name_std in ["DRILLS", "SPOT / CENTER DRILLS"]:
+                        # Direct check
+                        if abs(item_size_inch - diam_val) <= 0.005:
+                            pass 
+                        # 2. REFINED METRIC FALLBACK
+                        # Only trigger if the input 'looks' like a metric number (e.g., 1.0 or higher)
+                        # This prevents .122 from being converted into .0048 inches.
+                        elif diam_val >= 1.0 and abs(item_size_inch - (diam_val / 25.4)) <= 0.005:
+                            pass
+                        
+                        else:
+                            continue
+
+                    # 3. ALL OTHER CATEGORIES: Standard check
+                    else:
+                        if abs(item_size_inch - diam_val) <= 0.002:
+                            pass
+                        else:
+                            continue
                 else:
-                    continue # No matchue
+                    # If tool has no size in description, skip it during a diameter search
+                    continue
             
             results.append(item)
         return results
@@ -286,7 +287,7 @@ class ToolSearcher:
     def run(self):
         while True:
             self.history = []
-            categories = {g["name"]: g["name"] for g in ALIAS_GROUPS}
+            categories = {g["name"]: g["name"] for g in TOOL_CRIB_SEARCH_ALIAS_LIST}
             categories["EXIT"] = "EXIT"
             sel_cat = self.get_menu_choice(categories, "Select Tool Category")
             if sel_cat == "EXIT" or sel_cat == "BACK_REQ": break

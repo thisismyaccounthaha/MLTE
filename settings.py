@@ -44,6 +44,10 @@ class Settings:
     def special_sub_types(self): return self.data["special_sub_types"]
 
     @property
+    def toolCribSearchAliasList(self):
+        return self.data.get("toolCribSearchAliasList", [])
+
+    @property
     def tap_standard(self): return self.data["tap_standard"]
 
     @property
