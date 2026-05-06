@@ -47,10 +47,25 @@ GAUGE_CONSTANTS = {
 }
 
 class ToolSearcher:
-    def __init__(self, db_path):
-        self.db_path = db_path
-        self.history = []
+    def __init__(self, main_db_path, shadow_db_path=None):
+        # 1. Standardize the path variable name to match what _load_db() uses
+        self.db_path = main_db_path
+        self.shadow_db_path = shadow_db_path
+        
+        # 2. Load the main database using your helper method
         self.data = self._load_db()
+            
+        # 3. Load the shadow database safely
+        self.shadow_data = {}
+        if self.shadow_db_path and os.path.exists(self.shadow_db_path):
+            try:
+                with open(self.shadow_db_path, 'r') as f:
+                    self.shadow_data = json.load(f)
+            except Exception as e:
+                print(f"Error loading shadow database: {e}")
+
+        # 4. Initialize search state and navigation values
+        self.history = []
         self.results = []
         self.results_stack = []
         self.page = 0
@@ -120,7 +135,7 @@ class ToolSearcher:
     
         # 3. PRIORITY 1: Fractions (e.g., 1/2)
         # We look for a fraction anywhere in that first segment
-        frac_match = re.search(r'(\d+/\d+)', head)
+        frac_match = re.search(r'(?<!-)\b(\d+/\d+)\b', head)
         if frac_match:
             try:
                 n, d = frac_match.group(1).split('/')
@@ -150,110 +165,165 @@ class ToolSearcher:
     
         return None
 
+    def convert_fraction_to_decimal(self, frac_str):
+        try:
+            if '/' in frac_str:
+                num, denom = frac_str.split('/')
+                return float(num) / float(denom)
+            return float(frac_str)
+        except:
+            return None
+
+
     def filtered_search(self, cat_name, diam_val, keywords, source_set=None, dynamic_regex=None):
         dataset = source_set if source_set is not None else self.data
         cat_name_std = str(cat_name).upper() 
         group_meta = next((g for g in TOOL_CRIB_SEARCH_ALIAS_LIST if g["name"].upper() == cat_name_std), None)
         
         results = []
-        search_query = str(keywords).lower() if keywords else ""
-
+        search_query_list = keywords if keywords else []
+    
         for item in dataset:
-            # Extract fields safely
-            desc = str(item.get("descr", "")).lower()
-            alias = str(item.get("itemAliasNumber", "")).lower()
+            # 1. Standard Fields
+            desc_orig = str(item.get("descr", ""))
+            alias = str(item.get("itemAliasNumber", ""))
             item_n = str(item.get("itemNumber", "")).lower()
             i_grp = str(item.get("itemGroupDescr", "")).upper()
             i_sub = str(item.get("itemSubGroupDescr", "")).upper()
-            brand = str(item.get("brand", "")).lower() # <--- NEW: Extract Brand
-            
-            # --- UPDATED: ADDED BRAND TO SEARCH STRING ---
-            # Search now covers: Item#, Alias, Description, Group, Sub-Group, and Brand
-            combined = f"{item_n} {alias} {desc} {i_grp.lower()} {i_sub.lower()} {brand}"
+            brand_orig = str(item.get("brand", "")).lower()
 
+            
+            # 2. Shadow Link
+            shadow_info = self.shadow_data.get(alias, {})
+            shadow_desc = str(shadow_info.get("description", "")).lower()
+            shadow_brand = str(shadow_info.get("brand", "")).lower()
+    
+            combined = f"{item_n} {alias} {desc_orig.lower()} {i_grp.lower()} {i_sub.lower()} {brand_orig} {shadow_desc} {shadow_brand}"
+            
+            if group_meta:
+                he = group_meta.get("hard_exclude", set())
+                # If any exclude word is found, skip this item entirely
+                if any(re.search(rf"\b{re.escape(x)}\b", combined) for x in he):
+                    continue
+
+
+            # 3. Category Filter
+            match = False
             if cat_name_std == "SEARCH ALL":
                 match = True 
             else:
-                match = False
-                # EXCLUDE Spot Drills from main Drills category
                 if cat_name_std == "DRILLS":
-                    if i_grp == "DRILL" and i_sub != "SPOT DRILL": 
-                        match = True
-                
-                # INCLUDE Spot Drills specifically here
+                    if i_grp == "DRILL" and i_sub != "SPOT DRILL": match = True
                 elif cat_name_std == "SPOT / CENTER DRILLS":
-                    if i_sub == "SPOT DRILL" or i_grp == "SPOT": 
-                        match = True
-                
-                # Standard category matches
+                    if i_sub == "SPOT DRILL" or i_grp == "SPOT": match = True
                 elif cat_name_std == "CHAMFER MILLS" and i_sub == "CHMF MILL": match = True
                 elif cat_name_std == "COUNTERSINKS" and i_grp == "COUNTERSINK": match = True
                 elif cat_name_std == "REAMERS" and i_grp == "REAMER": match = True
-                elif cat_name_std == "TAPS" and (
-                    i_sub == "FORM TAP" or 
-                    i_sub == "GUN TAP" or 
-                    i_sub == "HELICOIL TAP" or 
-                    i_sub == "HIGH SPIRAL TAP" or 
-                    i_sub == "METRIC TAP" or 
-                    i_sub == "SPIRALOK TAP"
-                ):
+                elif cat_name_std == "TAPS" and i_sub in ["FORM TAP", "GUN TAP", "HELICOIL TAP", "HIGH SPIRAL TAP", "METRIC TAP", "SPIRALOK TAP"]:
                     match = True
                 
-                # Synonym Fallback
                 if not match and group_meta:
                     he = group_meta.get("hard_exclude", set())
                     ws = group_meta.get("word_syns", set())
                     ps = group_meta.get("part_syns", set())
                     if any(re.search(rf"\b{re.escape(x)}\b", combined) for x in he): continue
-                    if any(re.search(rf"\b{re.escape(s)}(?=[,\s]|$)", combined) for s in ws) or \
-                       any(s in combined for s in ps):
+                    if any(re.search(rf"\b{re.escape(s)}(?=[,\s]|$)", combined) for s in ws) or any(s in combined for s in ps):
                         match = True
-
+    
             if not match: continue
-
-            # The search query now automatically checks the brand as well
-            if search_query and search_query not in combined:
-                continue
-
-            if dynamic_regex:
-                if not re.search(dynamic_regex, combined, re.IGNORECASE): continue
-
+    
+            # 4. Keyword/Regex Filter
+            if search_query_list and not all(k.lower() in combined for k in search_query_list): continue
+            if dynamic_regex and not re.search(dynamic_regex, combined, re.IGNORECASE): continue
+    
+            # 5. Diameter Logic (THE CRASH FIX)
             if diam_val is not None:
-                item_size_inch = self.extract_size(desc)
+                item_size_inch = None
+                # Ensure specs is actually a list before iterating
+                specs = shadow_info.get("specs", [])
+                if not isinstance(specs, list): specs = []
                 
-                if item_size_inch is not None:
-                    # 1. REAMER LOGIC: Strict +/- 0.0005
-                    if cat_name_std == "REAMERS":
-                        if abs(item_size_inch - diam_val) <= 0.0005:
-                            pass # Match
-                        else:
-                            continue
+                # Internal Helper with extra safety
+                def get_spec(target_name):
+                    for s in specs:
+                        # Check if spec is the [name, {value_dict}] format
+                        if isinstance(s, list) and len(s) >= 2 and s[0] == target_name:
+                            val_obj = s[1]
+                            if isinstance(val_obj, dict):
+                                return val_obj.get("value")
+                        # Keep your existing dict check just in case
+                        if isinstance(s, dict) and s.get("name") == target_name:
+                            val = s.get("value")
+                            if isinstance(val, list) and len(val) > 0:
+                                return val[0].get("value") if isinstance(val[0], dict) else val[0]
+                            return val
+                    return None
 
-                    # 2. DRILL LOGIC: Similarity Bridge +/- 0.005
-                    elif cat_name_std in ["DRILLS", "SPOT / CENTER DRILLS"]:
-                        # Direct check
-                        if abs(item_size_inch - diam_val) <= 0.005:
-                            pass 
-                        # 2. REFINED METRIC FALLBACK
-                        # Only trigger if the input 'looks' like a metric number (e.g., 1.0 or higher)
-                        # This prevents .122 from being converted into .0048 inches.
-                        elif diam_val >= 1.0 and abs(item_size_inch - (diam_val / 25.4)) <= 0.005:
-                            pass
-                        
-                        else:
-                            continue
+                if cat_name_std == "DRILLS":
+                    item_size_inch = get_spec("Drill Bit Size (Decimal Inch)")
 
-                    # 3. ALL OTHER CATEGORIES: Standard check
-                    else:
-                        if abs(item_size_inch - diam_val) <= 0.002:
-                            pass
-                        else:
-                            continue
+                elif cat_name_std == "SPOT / CENTER DRILLS":
+                    # Check for the specific Spot Drill decimal key first
+                    item_size_inch = get_spec("Drill Diameter (Decimal Inch)")
+                    if item_size_inch is None:
+                        item_size_inch = get_spec("Drill Bit Size (Decimal Inch)")
+
+                elif "END MILL" in cat_name_std or "ENDMILL" in cat_name_std:
+                    item_size_inch = get_spec("Mill Diameter (Decimal Inch)")
+
+                elif cat_name_std == "REAMERS":
+                    item_size_inch = get_spec("Reamer Diameter (Decimal Inch)")
+
+                elif cat_name_std == "COUNTERSINKS":
+                    # Priority 1: Body Diameter, Priority 2: Head Diameter
+                    item_size_inch = get_spec("Body Diameter (Inch)")
+                    if item_size_inch is None:
+                        item_size_inch = get_spec("Head Diameter (Decimal Inch)")
+
+                elif "DOUBLE ANGLE" in cat_name_std or "UNDERCUT" in cat_name_std:
+                    raw_da = get_spec("Cutter Diameter (Inch)")
+                    if raw_da:
+                        item_size_inch = self.convert_fraction_to_decimal(str(raw_da))
+
+                elif cat_name_std == "CHAMFER MILLS":
+                    raw_chamfer = get_spec("Cutter Head Diameter (Fractional Inch)")
+                    if raw_chamfer:
+                        item_size_inch = self.convert_fraction_to_decimal(str(raw_chamfer))
+
+                elif cat_name_std == "TAPS":
+                    item_size_inch = get_spec("Thread Size (Inch)")
+
+                elif "THREAD MILL" in cat_name_std:
+                    # For Thread Mills, the 'diam_val' input is actually the TPI (e.g., 28)
+                    item_size_inch = get_spec("Teeth Per Inch")
+
+                # --- FALLBACK & COMPARISON ---
+                if item_size_inch is None:
+                    item_size_inch = self.extract_size(desc_orig)
                 else:
-                    # If tool has no size in description, skip it during a diameter search
+                    try:
+                        item_size_inch = float(item_size_inch)
+                    except (ValueError, TypeError):
+                        item_size_inch = self.extract_size(desc_orig)
+
+                if item_size_inch is not None:
+                    # Special strictness for Reamers and Thread Mill Pitch
+                    if cat_name_std in ["REAMERS", "TAPS"] or "THREAD MILL" in cat_name_std:
+                        if abs(item_size_inch - diam_val) > 0.0005: continue
+
+                    elif cat_name_std in ["DRILLS", "SPOT / CENTER DRILLS"]:
+                        direct_match = abs(item_size_inch - diam_val) <= 0.005
+                        metric_match = (diam_val >= 1.0 and abs(item_size_inch - (diam_val / 25.4)) <= 0.005)
+                        if not (direct_match or metric_match): continue
+
+                    else: 
+                        # Default tolerance for End Mills, Countersinks, etc.
+                        if abs(item_size_inch - diam_val) > 0.002: continue
+                else:
                     continue
-            
+                
             results.append(item)
+    
         return results
 
     def get_menu_choice(self, options, title):
@@ -395,8 +465,24 @@ class ToolSearcher:
 
                     new_results = []
                     for item in self.results:
-                        # BUILD DATA STRING: Include ALL relevant fields
-                        data_str = deep_clean(f"{item.get('itemNumber','')} {item.get('itemAliasNumber','')} {item.get('descr','')} {item.get('brand','')} {item.get('itemGroupDescr','')} {item.get('itemSubGroupDescr','')}")
+                        # 1. PULL THE SHADOW DATA FOR THIS SPECIFIC ITEM
+                        alias = str(item.get('itemAliasNumber', ''))
+                        shadow_info = self.shadow_data.get(alias, {})
+                        shadow_desc = shadow_info.get("description", "")
+                        shadow_brand = shadow_info.get("brand", "")
+
+                        # 2. ADD SHADOW DATA TO THE SEARCHABLE STRING
+                        # Include shadow_desc and shadow_brand so [S] Refine can "see" them
+                        data_str = deep_clean(
+                            f"{item.get('itemNumber','')} "
+                            f"{alias} "
+                            f"{item.get('descr','')} "
+                            f"{item.get('brand','')} "
+                            f"{item.get('itemGroupDescr','')} "
+                            f"{item.get('itemSubGroupDescr','')} "
+                            f"{shadow_desc} "   
+                            f"{shadow_brand}"  
+                        )
                         
                         match = any(t in data_str for t in terms)
                         

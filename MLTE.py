@@ -1868,7 +1868,7 @@ def main():
 
         # --- 2. Read-Only & Utility Routes ---
         if action == "CKSEARCH": 
-            CribSearch.ToolSearcher(os.path.join(os.path.dirname(os.path.abspath(__file__)), "database.json")).run(); continue
+            CribSearch.ToolSearcher(os.path.join(os.path.dirname(os.path.abspath(__file__)), "database.json"), os.path.join(os.path.dirname(os.path.abspath(__file__)), "shadowdatabase.json")).run(); continue
         if action == "SEARCH":
             run_db_search(app); continue
         if action == "KSEARCH":

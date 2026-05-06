@@ -263,7 +263,7 @@
             "word_syns": ["endmill", "end mill", "mill", "em", "e.m."],
             "part_syns": ["sem", "eml", "sqr end", "square end", "flat end", "e.m."],
             "alias_exclude": ["item", "system", "them", "email", "dykem"],
-            "hard_exclude": ["ball", "b.e.m.", "insert", "engraving", "extension", "lab", "tpi", "chmfr", "assembly", "chmf", "bn", "bastard", "radius", "rad", "c.r.", "cr", "corner", "bullnose", "chamfer", "chf", "tap", "lollipop", "thread"]
+            "hard_exclude": ["ball", "moved", "b.e.m.", "insert", "fuse","engraving", "extension", "lab", "tpi", "chmfr", "assembly", "chmf", "bn", "bastard", "radius", "rad", "c.r.", "cr", "corner", "bullnose", "chamfer", "chf", "tap", "lollipop", "thread"]
         },
         {
             "name": "Ball Mill",
@@ -284,7 +284,7 @@
             "word_syns": ["drill", "drilling", "jobber", "stub drill", "micro drill", "carbide drill", "130d", "118d", "135d", "para drill", "cool thru drill", "guhr", "screw mach drl"],
             "part_syns": ["drl"],
             "alias_exclude": [],
-            "hard_exclude": ["tap", "threadmill", "tm", "reams", "reamer", "spot", "drill mill", "chf", "chamf", "chamfer", "countersink", "csink", "ctrsnk"]
+            "hard_exclude": ["tap", "threadmill", "tm", "moved", "reams", "reamer", "spot", "drill mill", "chf", "chamf", "chamfer", "countersink", "csink", "ctrsnk"]
         },
         {
             "name": "Taps",
