@@ -74,59 +74,61 @@ class ToolSearcher:
 
     def _create_searchable_db(self):
         merged_list = []
-        linked_count = 0
         
-        # Get a sample of shadow keys to see what we are working with
-        shadow_keys = list(self.shadow_data.keys())
-        sample_keys = shadow_keys[:3] if shadow_keys else "EMPTY"
-
         print("\n" + "—"*50)
         print("INITIALIZING SEARCHABLE MASTER DATABASE...")
-        print(f"DEBUG: Shadow DB sample keys: {sample_keys}")
         
         for item in self.raw_main_data:
-            # 1. Get the raw alias and clean it
+            # --- EXISTING BRIDGE LOGIC ---
             raw_val = item.get("itemAliasNumber", "")
-            # Ensure it's a string and strip any .0 if it came from Excel
             alias_str = str(raw_val).strip().split('.')[0]
             
-            # 2. THE BRIDGE CHECK
-            # Try exact, try 8-digit padding (MSC standard), try 7-digit padding
             shadow_info = (
                 self.shadow_data.get(alias_str) or 
                 self.shadow_data.get(alias_str.zfill(8)) or
                 self.shadow_data.get(alias_str.zfill(7))
             )
             
+            s_desc, s_brand, s_specs_str, raw_specs = "", "", "", []
+
             if shadow_info:
-                linked_count += 1
-                
-                # Extract Description safely
-                s_desc = shadow_info.get("description") or shadow_info.get("descr") or ""
-                s_brand = shadow_info.get("brand") or ""
-                
-                # Flatten specs
+                s_desc = str(shadow_info.get("description") or shadow_info.get("descr") or "").lower()
+                s_brand = str(shadow_info.get("brand") or "").lower()
                 raw_specs = shadow_info.get("specs", [])
-                s_specs_str = ""
                 if isinstance(raw_specs, list):
                     s_specs_str = " ".join([
                         str(s[1].get("value", "")) if (isinstance(s, list) and len(s) > 1 and isinstance(s[1], dict))
                         else str(s) for s in raw_specs
-                    ])
+                    ]).lower()
 
-                item["shadow_desc"] = str(s_desc).lower()
-                item["shadow_brand"] = str(s_brand).lower()
-                item["shadow_specs"] = s_specs_str.lower()
-                item["specs"] = raw_specs 
-            else:
+            # Inject pre-processed shadow fields
+            item["shadow_desc"] = s_desc
+            item["shadow_brand"] = s_brand
+            item["shadow_specs"] = s_specs_str
+            item["specs"] = raw_specs 
 
-                item["shadow_desc"] = ""
-                item["shadow_brand"] = ""
-                item["shadow_specs"] = ""
-                item["specs"] = []
+            # --- NEW: PRE-BUILD THE SEARCH BLOB ---
+            # This is the "Master String" we will search against later
+            item_desc_orig = str(item.get("descr", "")).lower()
+            item["search_blob"] = " ".join([
+                str(item.get("itemNumber", "")),
+                alias_str,
+                item_desc_orig,
+                str(item.get("itemGroupDescr", "")).lower(),
+                str(item.get("itemSubGroupDescr", "")).lower(),
+                str(item.get("brand", "")).lower(),
+                s_desc,
+                s_brand,
+                s_specs_str
+            ]).lower()
+
+            # --- NEW: PRE-EXTRACT SIZE ---
+            # Instead of regexing sizes during every search, do it once here
+            item["clean_size"] = self.extract_size(item_desc_orig)
 
             merged_list.append(item)
         
+        print(f"DATABASE READY: {len(merged_list)} items indexed.")
         return merged_list
 
 
@@ -238,91 +240,83 @@ class ToolSearcher:
         cat_name_std = str(cat_name).upper() 
         group_meta = next((g for g in TOOL_CRIB_SEARCH_ALIAS_LIST if g["name"].upper() == cat_name_std), None)
         
+        # Pre-process search parameters once
+        search_query_list = [k.lower() for k in keywords] if keywords else []
+        compiled_dyn_reg = re.compile(dynamic_regex, re.IGNORECASE) if dynamic_regex else None
+        radius_pattern = re.compile(r"(?:\d+\.?\d*|(?:\d+\s+)?\d+/\d+)\s?(?:cr|r|rad)\b")
+
+        # Pre-compile group filters
+        pe, we_regexes, wi_regexes, pi = [], [], [], []
+        if group_meta:
+            pe = [x.lower() for x in group_meta.get("part_exclude", [])]
+            we_regexes = [re.compile(rf"\b{re.escape(x.lower())}\b") for x in group_meta.get("word_exclude", [])]
+            wi_regexes = [re.compile(rf"\b{re.escape(x.lower())}\b") for x in group_meta.get("word_include", [])]
+            pi = [x.lower() for x in group_meta.get("part_include", [])]
+
         results = []
-        search_query_list = keywords if keywords else []
-    
+        for item in dataset:
+            combined = item["search_blob"] # <--- FAST ACCESS
+
         for item in dataset:
             # --- 1. ACCESS PRE-MERGED DATA ---
-            item_n = str(item.get("itemNumber", "")).lower()
-            alias = str(item.get("itemAliasNumber", "")).lower()
+            # Note: items are now converted to string once
             desc_orig = str(item.get("descr", "")).lower()
-            i_grp = str(item.get("itemGroupDescr", "")).lower()
-            i_sub = str(item.get("itemSubGroupDescr", "")).lower()
-            brand_orig = str(item.get("brand", "")).lower()
-            
-            # These are the shadow fields we injected during __init__
-            s_desc = item.get("shadow_desc", "")
-            s_brand = item.get("shadow_brand", "")
-            s_specs = item.get("shadow_specs", "")
-            # Ensure we keep the raw specs list for deep attribute searching
-            specs = item.get("specs", []) 
-
-            # --- 2. BUILD MASTER SEARCH STRING ---
             combined = " ".join([
-                item_n, alias, desc_orig, i_grp, i_sub, 
-                brand_orig, s_desc, s_brand, s_specs
+                str(item.get("itemNumber", "")),
+                str(item.get("itemAliasNumber", "")),
+                desc_orig,
+                str(item.get("itemGroupDescr", "")),
+                str(item.get("itemSubGroupDescr", "")),
+                str(item.get("brand", "")),
+                item.get("shadow_desc", ""),
+                item.get("shadow_brand", ""),
+                item.get("shadow_specs", "")
             ]).lower()
 
             # --- 3. CATEGORY & GEOMETRY FILTERS ---
             if group_meta:
                 match = False
 
-                # A. Hard Excludes (part_exclude and word_exclude)
-                pe = [x.lower() for x in group_meta.get("part_exclude", [])]
-                if any(x in combined for x in pe):
-                    continue
+                # A. Hard Excludes
+                if any(x in combined for x in pe): continue
+                if any(rx.search(combined) for rx in we_regexes): continue
 
-                we = [x.lower() for x in group_meta.get("word_exclude", [])]
-                if any(re.search(rf"\b{re.escape(x)}\b", combined) for x in we):
-                    continue
-                
-            
                 # B. Radius/Geometry Check
-                # Specifically looking for notations like .030R, 1/16 RAD, or CR
-                # This pattern is much more robust for shop data
-                radius_pattern = r"(?:\d+\.?\d*|(?:\d+\s+)?\d+/\d+)\s?(?:cr|r|rad)\b"
-
-                # We use combined.lower() to be 100% sure case isn't the issue
-                has_radius = bool(re.search(radius_pattern, combined.lower()))
+                has_radius = bool(radius_pattern.search(combined))
 
                 if cat_name_std == "SQUARE ENDMILL" and has_radius:
-                    # This should now catch ".030cr" and "1/16 RAD"
                     continue
                 
                 # C. Include Logic
-                wi = [x.lower() for x in group_meta.get("word_include", [])]
-                pi = [x.lower() for x in group_meta.get("part_include", [])]
-                
-                if not wi and not pi:
+                if not wi_regexes and not pi:
                     match = True
                 else:
-                    # Check for whole-word matches (wi) or partial matches (pi)
-                    if any(re.search(rf"\b{re.escape(x)}\b", combined) for x in wi):
+                    if any(rx.search(combined) for rx in wi_regexes):
                         match = True
                     elif any(x in combined for x in pi):
                         match = True
-                
-                # D. Bull Mill Override: If it has a radius and we are searching Bull Mills, it's a win
+
+                # D. Bull Mill Override
                 if cat_name_std == "BULL MILL" and has_radius:
                     match = True
             else:
-                # Fallback for "Search All" or undefined categories
                 match = (cat_name_std == "SEARCH ALL")
 
             if not match:
                 continue
-    
+
             # --- 4. KEYWORD & REGEX FILTER ---
-            if search_query_list and not all(k.lower() in combined for k in search_query_list):
+            if search_query_list and not all(k in combined for k in search_query_list):
                 continue
-            if dynamic_regex and not re.search(dynamic_regex, combined, re.IGNORECASE):
+            if compiled_dyn_reg and not compiled_dyn_reg.search(combined):
                 continue
-    
+
             # --- 5. DIAMETER LOGIC ---
             if diam_val is not None:
+                specs = item.get("specs", [])
                 item_size_inch = None
-                
-                # Internal Spec Helper
+
+                # Internal Spec Helper (remains local to stay clean)
                 def get_spec(target_name):
                     if not isinstance(specs, list): return None
                     for s in specs:
@@ -353,7 +347,7 @@ class ToolSearcher:
                 elif "THREAD MILL" in cat_name_std:
                     item_size_inch = get_spec("Teeth Per Inch")
 
-                # Fallback to Regex extraction if specs failed
+                # Fallback to Regex extraction
                 if item_size_inch is None:
                     item_size_inch = self.extract_size(desc_orig)
                 else:
@@ -362,7 +356,6 @@ class ToolSearcher:
                     except (ValueError, TypeError):
                         item_size_inch = self.extract_size(desc_orig)
 
-                # Tolerance Validation
                 if item_size_inch is None:
                     continue
                 
@@ -370,18 +363,17 @@ class ToolSearcher:
                 if cat_name_std in ["REAMERS", "TAPS"] or "THREAD MILL" in cat_name_std:
                     if diff > 0.0005: continue
                 elif cat_name_std in ["DRILLS", "SPOT / CENTER DRILLS"]:
-                    # Check for direct match OR metric-to-inch conversion match
                     direct_match = diff <= 0.005
                     metric_match = (diam_val >= 1.0 and abs(item_size_inch - (diam_val / 25.4)) <= 0.005)
                     if not (direct_match or metric_match): continue
                 else:
-                    # Standard 0.002 tolerance for end mills, etc.
                     if diff > 0.002: continue
-                
-            # SUCCESS: Add to results
+
             results.append(item)
-    
+
         return results
+    
+        
 
     def get_menu_choice(self, options, title):
         keys = list(options.keys())
