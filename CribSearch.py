@@ -72,11 +72,57 @@ class ToolSearcher:
         self.page = 0
         self.page_size = 15
 
+    def clear(self, title=""):
+        os.system('cls' if os.name == 'nt' else 'clear')
+        if hasattr(self, 'history') and self.history:
+            # Yellow Breadcrumb Bar
+            print(f"\033[1;33m{' > '.join(self.history)}\033[0m")
+            print("\033[1;33m" + "—" * 85 + "\033[0m")
+        else:
+            print("\033[1;34m--- TOOL SEARCHER V3 ---\033[0m\n")
+        
+        if title:
+            print(f"\033[1;36m[ {title.upper()} ]\033[0m\n")
+
+    def get_menu_choice(self, options, title):
+        keys = list(options.keys())
+        idx = 0
+        self.clear(title)
+        sys.stdout.write("\033[?25l") # Hide cursor
+        
+        try:
+            while True:
+                sys.stdout.write("\033[J") # Clear below
+                output = []
+                for i, name in enumerate(keys):
+                    if i == idx:
+                        output.append(f"  \033[1;97;42m > {name} \033[0m")
+                    else:
+                        output.append(f"    {name}")
+                
+                sys.stdout.write("\n".join(output) + "\n")
+                sys.stdout.flush()
+
+                key = readchar.readkey()
+                if key == readchar.key.UP:
+                    idx = (idx - 1) % len(keys)
+                elif key == readchar.key.DOWN:
+                    idx = (idx + 1) % len(keys)
+                elif key == readchar.key.ENTER:
+                    choice_label = keys[idx]
+                    if choice_label not in ["EXIT", "BACK"]:
+                        self.history.append(choice_label[:15])
+                    return options[choice_label]
+                elif key in [readchar.key.ESC, readchar.key.BACKSPACE]:
+                    return "BACK_REQ"
+                
+                sys.stdout.write(f"\033[{len(keys)}F") # Move cursor back up
+        finally:
+            sys.stdout.write("\033[?25h") # Show cursor
+
     def _create_searchable_db(self):
         merged_list = []
         
-        print("\n" + "—"*50)
-        print("INITIALIZING SEARCHABLE MASTER DATABASE...")
         
         for item in self.raw_main_data:
             # --- EXISTING BRIDGE LOGIC ---
@@ -127,8 +173,7 @@ class ToolSearcher:
             item["clean_size"] = self.extract_size(item_desc_orig)
 
             merged_list.append(item)
-        
-        print(f"DATABASE READY: {len(merged_list)} items indexed.")
+    
         return merged_list
 
 
@@ -409,147 +454,319 @@ class ToolSearcher:
             categories = {g["name"]: g["name"] for g in TOOL_CRIB_SEARCH_ALIAS_LIST}
             categories["EXIT"] = "EXIT"
             sel_cat = self.get_menu_choice(categories, "Select Tool Category")
-            if sel_cat == "EXIT" or sel_cat == "BACK_REQ": break
+            
+            if sel_cat == "EXIT" or sel_cat == "BACK_REQ": 
+                break
 
             diam_val = None
             dyn_reg = None
             keywords = ""
+            breadcrumb_diam = "ALL" 
 
-            # --- SEARCH ALL: Jump straight to view ---
+            # --- SEARCH ALL ---
             if sel_cat == "SEARCH ALL":
                 self.results_stack = []
-                self.results = list(self.data) # Load everything
+                self.results = list(self.data)
                 self.page = 0
-                self.results_loop(sel_cat)
-                continue # Return to categories after exiting results_loop
+                self.results_loop(sel_cat, "ALL")
+                continue 
 
-            # Standard category logic for others...
+            # --- SPECIAL CATEGORIES ---
             elif sel_cat == "Taps":
                 self.clear("Dynamic Tap Search")
                 user_in = input("Enter Tap Size: ").strip()
                 if user_in:
+                    breadcrumb_diam = user_in
                     self.history.append(user_in)
                     parts = re.split(r'[- Xx]+', user_in)
                     dyn_reg = rf"\b{re.escape(parts[0])}[- X\s]*{re.escape(parts[1])}" if len(parts) >= 2 else rf"\b{re.escape(user_in)}\b"
+            
             elif sel_cat == "Thread Mills":
                 self.clear("Thread Mill Pitch Search")
                 pitch = input("Enter Pitch: ").strip()
                 if pitch:
+                    breadcrumb_diam = pitch
                     self.history.append(pitch)
                     dyn_reg = rf"[- X\s]{re.escape(pitch)}(\b|[A-Z])"
 
+            # --- STANDARD CATEGORIES ---
             else:
                 self.clear("Input Parameters")
                 diam_str = input("Diameter (Enter for all): ").strip()
                 if diam_str:
-                    self.history.append(diam_str) # Add diameter to history
+                    breadcrumb_diam = diam_str
+                    self.history.append(diam_str)
                     diam_val = self.parse_size(diam_str)
-            # Inside the run(self) method, right before initial search:
-            self.results_stack = [] # Reset stack for a new top-level search
+
+            # --- EXECUTE SEARCH ---
+            self.results_stack = [] 
             self.results = self.filtered_search(sel_cat, diam_val, keywords, dynamic_regex=dyn_reg)
             self.page = 0
-            self.results_loop(sel_cat)
+            
+            # Pass the category and the diameter string to the loop
+            self.results_loop(sel_cat, breadcrumb_diam)
 
-    def results_loop(self, title):
+    def deep_clean(self, text):
+        if text is None:
+            return ""
+        return " ".join(str(text).split()).lower()
+
+    def results_loop(self, category_name, diameter):
+        # Navigation and Pagination state
+        page = 0
+        idx = 0
+        page_size = 20  
+        results_stack = []
+        
+        # Breadcrumbs initialized with Diameter then Category
+        breadcrumbs = [str(diameter), category_name.upper()]
+
+        # ANSI Color codes for UI
+        BAR_COLOR = "\033[1;33m"      # Yellow
+        HEAD_COLOR = "\033[1;37m"     # Bold White
+        SUB_COLOR = "\033[90m"        # Gray
+        DESC_COLOR = "\033[1;38;5;51m" # Cyan
+        NUM_NORMAL = "\033[1;37m"     # White Num
+        NUM_CONFLICT = "\033[1;97;41m" # Red BG
+        SEL_CURSOR = "\033[1;30;102m" # Green Arrow Highlight
+        COL_CAT = "\033[1;32m"        # Static Green
+        RESET = "\033[0m"
+
+        # Widths for table columns
+        item_w = 4
+        desc_w = 65
+        cat_w = 12
+
+        # Initialize screen
+        os.system('cls' if os.name == 'nt' else 'clear')
+        sys.stdout.write("\033[?25l") # Hide cursor
+
         while True:
+            # --- DYNAMIC SUB-CAT WIDTH CALCULATION ---
+            # We calculate the widest sub-category currently in the filtered list
+            raw_sub_w = 7 
+            if len(self.results) > 0:
+                current_max = 0
+                for item in self.results:
+                    val = str(item.get('itemSubGroupDescr', ''))
+                    if len(val) > current_max:
+                        current_max = len(val)
+                raw_sub_w = current_max
+            
+            # Clamp the width between 7 and 30 characters
+            if raw_sub_w < 7:
+                sub_w = 7
+            elif raw_sub_w > 30:
+                sub_w = 30
+            else:
+                sub_w = raw_sub_w
+
+            # --- PAGINATION CALCULATIONS ---
+            sys.stdout.write("\033[H") # Move cursor to top left
             total_items = len(self.results)
-            total_pages = max(1, (total_items + self.page_size - 1) // self.page_size)
-            current_page_display = self.page + 1
-
-            self.clear(f"Results: {title} ({total_items}) | Page {current_page_display} of {total_pages}")
+            total_pages = (total_items + page_size - 1) // page_size
+            if total_pages < 1:
+                total_pages = 1
             
-            # (Keep your existing table drawing logic here...)
-            # --- TABLE DRAWING START ---
-            W_ITEM = 5 
-            start = self.page * self.page_size
-            batch = self.results[start:start + self.page_size]
-            current_max_info, current_max_desc, formatted_data = 0, 0, []
-            for m in batch:
-                item_n, alias, grp, sub, descr = str(m.get('itemNumber', ''))[:W_ITEM], str(m.get('itemAliasNumber', '')), str(m.get('itemGroupDescr', '')), str(m.get('itemSubGroupDescr', '')), str(m.get('descr', ''))
-                cat_tag = f"[{grp}/{sub}]"; alias_part = f"{alias} " if alias else ""; plain_info = f"{alias_part}{cat_tag}"
-                current_max_info = max(current_max_info, len(plain_info)); current_max_desc = max(current_max_desc, len(descr))
-                formatted_data.append({'item': item_n, 'alias': alias_part, 'cat': cat_tag, 'desc': descr, 'plain_len': len(plain_info)})
-            W_INFO = current_max_info + 1
-            total_bar_length = W_ITEM + 3 + W_INFO + 3 + current_max_desc
-            print(f"{'ITEM#':<{W_ITEM}} | {'ALIAS & CATEGORY':<{W_INFO}} | {'DESCRIPTION'}\n" + "—" * total_bar_length)
-            for d in formatted_data:
-                info_col = f"{C_ALIAS}{d['alias']}{C_RESET}\033[2;90m{d['cat']}\033[0m"
-                print(f"{C_ITEM}{d['item']:<{W_ITEM}}{C_RESET} | {info_col}{' '*(W_INFO-d['plain_len'])} | {C_DESC}{d['desc']}{C_RESET}")
-            print("—" * total_bar_length)
-            # --- TABLE DRAWING END ---
-
-            help_hint = " | [Ctrl+R] Help" if title == "SEARCH ALL" else ""
-            print(f"{C_HDR}[Arrows] Page {current_page_display}/{total_pages} | [S] Refine | [E] Exclude | [U] Undo{help_hint} | [ESC] Back{C_RESET}")
+            # Extract only the items for the current page
+            start_index = page * page_size
+            end_index = start_index + page_size
+            batch = self.results[start_index : end_index]
             
-            k = readchar.readkey()
+            # Ensure the selection cursor doesn't go out of bounds
+            if len(batch) > 0:
+                if idx >= len(batch):
+                    idx = len(batch) - 1
+            else:
+                idx = 0
 
-            # Helper for deep cleaning strings (removes spaces, dashes, etc)
-            def deep_clean(t):
-                return str(t).lower().replace(" ", "").replace("-", "")
+            # --- HEADER RENDERING ---
+            path_display = " > ".join(breadcrumbs)
+            if len(path_display) > 105:
+                path_display = "..." + path_display[-102:]
 
-            if k == "\x12" and title == "SEARCH ALL":
-                bat_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "cribsearchinstructions.bat")
-                os.system(f'start "" "{bat_path}"') if os.path.exists(bat_path) else print("Help not found.")
+            print(f"{BAR_COLOR} SEARCH PATH: {path_display}{RESET}\033[K")
+            print(f"{SUB_COLOR}{'—' * 119}{RESET}\033[K")
+            print(f"{DESC_COLOR}[ RESULTS: {total_items} ITEMS | PAGE {page+1} OF {total_pages} ]{RESET}\033[K\n")
+            
+            header_str = (
+                f"    {HEAD_COLOR}{'ITEM':<{item_w}} | "
+                f"{'DESCRIPTION':<{desc_w}} | "
+                f"{'CAT':<{cat_w}} | "
+                f"{'SUB-CAT':<{sub_w}}{RESET}"
+            )
+            print(f"{header_str}\033[K")
+            print(f"{SUB_COLOR}{'—' * 119}{RESET}\033[K")
 
-            elif k == rc_key.BACKSPACE or k == rc_key.ESC: 
+            # --- DATA ROWS RENDERING ---
+            for i in range(len(batch)):
+                item = batch[i]
+                if i == idx:
+                    selector = f"{SEL_CURSOR} > {RESET} "
+                else:
+                    selector = "    "
+                
+                # Extract and truncate fields to fit columns
+                cat_val = str(item.get('itemGroupDescr', 'None'))[:cat_w]
+                sub_val = str(item.get('itemSubGroupDescr', 'None'))[:sub_w]
+                item_no = str(item.get('itemNumber', ''))[:item_w]
+                descr = str(item.get('descr', ''))[:desc_w]
+                
+                # Check for conflicts to determine color
+                if item.get('has_conflict') == True:
+                    num_style = NUM_CONFLICT
+                else:
+                    num_style = NUM_NORMAL
+
+                row_line = (
+                    f"{selector}"
+                    f"{num_style}{item_no:<{item_w}}{RESET} {SUB_COLOR}| {RESET}"
+                    f"{DESC_COLOR}{descr:<{desc_w}}{RESET} {SUB_COLOR}| {RESET}"
+                    f"{COL_CAT}{cat_val:<{cat_w}}{RESET} {SUB_COLOR}| {RESET}"
+                    f"{BAR_COLOR}{sub_val:<{sub_w}}{RESET}"
+                )
+                print(f"{row_line}\033[K")
+
+            # Fill remaining page space with empty lines to prevent UI jumping
+            remaining_lines = page_size - len(batch)
+            for _ in range(remaining_lines): 
+                print("\033[K")
+                
+            # --- FOOTER RENDERING ---
+            print(f"{SUB_COLOR}{'—' * 119}{RESET}\033[K")
+            footer_text = " [Arrows] Nav | [I] Specs | [S] Refine | [E] Exclude | [U] Undo | [ESC] Back"
+            sys.stdout.write(f"{BAR_COLOR} {footer_text:<117}{RESET}\033[K")
+            sys.stdout.flush()
+
+            # --- KEYBOARD INPUT HANDLING ---
+            key = readchar.readkey()
+            
+            if key == readchar.key.UP:
+                if len(batch) > 0:
+                    if idx > 0:
+                        idx = idx - 1
+                    else:
+                        idx = len(batch) - 1
+            
+            elif key == readchar.key.DOWN:
+                if len(batch) > 0:
+                    if idx < (len(batch) - 1):
+                        idx = idx + 1
+                    else:
+                        idx = 0
+            
+            elif key == readchar.key.LEFT:
+                if page > 0:
+                    page = page - 1
+                    idx = 0
+            
+            elif key == readchar.key.RIGHT:
+                if page < (total_pages - 1):
+                    page = page + 1
+                    idx = 0
+
+            elif key.lower() == 'i':
+                if len(batch) > 0:
+                    selected_item_no = batch[idx].get('itemNumber')
+                    if selected_item_no:
+                        sys.stdout.write("\033[?25h") # Show cursor
+                        show_item_specs(ToolApp(), selected_item_no)
+                        sys.stdout.write("\033[?25l") # Hide cursor
+                        os.system('cls' if os.name == 'nt' else 'clear')
+
+            elif key.lower() == 's' or key.lower() == 'e':
+                # Determine Refine vs Exclude
+                if key.lower() == 's':
+                    mode = "S"
+                    label = 'Refine:'
+                else:
+                    mode = "E"
+                    label = 'Exclude:'
+
+                sys.stdout.write("\033[?25h") # Show cursor for typing
+                sys.stdout.write(f"\n{BAR_COLOR} {label}: {RESET}")
+                sys.stdout.flush()
+                
+                user_input = input().strip()
+                
+                if user_input != "":
+                    # Push current state to undo stack
+                    results_stack.append((list(self.results), list(breadcrumbs)))
+                    
+                    # Regex for double-double quotes: ""phrase"" or single words
+                    import re
+                    # Looks for text inside "" "" or sequences of non-whitespace
+                    raw_matches = re.findall(r'""([^""]*)""|(\S+)', user_input.lower())
+                    
+                    search_terms = []
+                    for m in raw_matches:
+                        if m[0]: # If group 1 (inside quotes) matched
+                            search_terms.append(self.deep_clean(m[0]))
+                        elif m[1]: # If group 2 (single word) matched
+                            search_terms.append(self.deep_clean(m[1]))
+
+                    if len(search_terms) > 0:
+                        filtered_list = []
+                        for item in self.results:
+                            # Build a large searchable string from item fields
+                            fields = [
+                                str(item.get('itemNumber','')), 
+                                str(item.get('itemAliasNumber','')), 
+                                str(item.get('descr','')), 
+                                str(item.get('brand','')), 
+                                str(item.get('itemGroupDescr','')), 
+                                str(item.get('itemSubGroupDescr',''))
+                            ]
+                            combined_data = self.deep_clean(" ".join(fields))
+                            
+                            # Perform OR check: match is true if ANY term is found
+                            has_match = False
+                            for t in search_terms:
+                                if t in combined_data:
+                                    has_match = True
+                                    break
+                            
+                            # Filter logic based on Mode
+                            if mode == "S": # Refine (Include matches)
+                                if has_match == True:
+                                    filtered_list.append(item)
+                            else: # Exclude (Remove matches)
+                                if has_match == False:
+                                    filtered_list.append(item)
+                        
+                        # Update state
+                        self.results = filtered_list
+                        page = 0
+                        idx = 0
+                        
+                        # Create Breadcrumb: "INC TERM1 OR TERM2"
+                        if mode == "S":
+                            prefix = "INC"
+                        else:
+                            prefix = "NOT"
+                        
+                        formatted_terms = []
+                        for t in search_terms:
+                            formatted_terms.append(t.upper())
+                        
+                        breadcrumb_text = prefix + " " + " OR ".join(formatted_terms)
+                        breadcrumbs.append(breadcrumb_text)
+                
+                # Cleanup the input line visually
+                sys.stdout.write("\033[1;A\033[2K\033[?25l")
+
+            elif key.lower() == 'u':
+                if len(results_stack) > 0:
+                    old_results, old_breadcrumbs = results_stack.pop()
+                    self.results = old_results
+                    breadcrumbs = old_breadcrumbs
+                    page = 0
+                    idx = 0
+                
+            elif key == readchar.key.ESC:
                 break
 
-            # --- UPDATED SEARCH LOGIC (S & E) ---
-            elif k.lower() in ["s", "e"]:
-                mode = "S" if k.lower() == "s" else "E"
-                prompt = "\nFuzzy Refine: " if mode == "S" else "\nTerm to Exclude: "
-                user_in = input(prompt).strip()
-                
-                if user_in:
-                    self.results_stack.append(list(self.results))
-                    is_or = '"' in user_in
-                    
-                    # Pre-clean search terms
-                    if is_or:
-                        terms = [deep_clean(t[0] if t[0] else t[1]) for t in re.findall(r'"([^"]*)"|(\S+)', user_in.lower())]
-                    else:
-                        terms = [deep_clean(user_in)]
-
-                    new_results = []
-                    for item in self.results:
-                        # 1. PULL THE SHADOW DATA FOR THIS SPECIFIC ITEM
-                        alias = str(item.get('itemAliasNumber', ''))
-                        shadow_info = self.shadow_data.get(alias, {})
-                        shadow_desc = shadow_info.get("description", "")
-                        shadow_brand = shadow_info.get("brand", "")
-
-                        # 2. ADD SHADOW DATA TO THE SEARCHABLE STRING
-                        # Include shadow_desc and shadow_brand so [S] Refine can "see" them
-                        data_str = deep_clean(
-                            f"{item.get('itemNumber','')} "
-                            f"{alias} "
-                            f"{item.get('descr','')} "
-                            f"{item.get('brand','')} "
-                            f"{item.get('itemGroupDescr','')} "
-                            f"{item.get('itemSubGroupDescr','')} "
-                            f"{shadow_desc} "   
-                            f"{shadow_brand}"  
-                        )
-                        
-                        match = any(t in data_str for t in terms)
-                        
-                        if mode == "S" and match: new_results.append(item)
-                        elif mode == "E" and not match: new_results.append(item)
-                    
-                    self.results = new_results
-                    prefix = "OR: " if is_or else ""
-                    self.history.append(f"{'INC' if mode == 'S' else 'NOT'}: {prefix}{user_in}")
-                    self.page = 0
-
-            elif k.lower() == "u" and self.results_stack:
-                self.results = self.results_stack.pop()
-                if self.history: self.history.pop()
-                self.page = 0
-            
-            elif k in [rc_key.DOWN, rc_key.RIGHT]:
-                if (self.page + 1) * self.page_size < len(self.results): self.page += 1
-            elif k in [rc_key.UP, rc_key.LEFT]:
-                if self.page > 0: self.page -= 1
-
+        # Cleanup on exit
+        sys.stdout.write("\033[?25h")
 if __name__ == "__main__":
     ToolSearcher("database.json", "shadowdatabase.json").run()
