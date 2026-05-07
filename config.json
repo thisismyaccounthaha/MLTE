@@ -77,37 +77,37 @@
             "name": "Line1",
             "ip": "10.10.5.56",
             "db": "Makino",
-            "path": "C:\\Users\\eweaver\\Documents\\PythonProjects\\MLTE\\1"
+            "path": "\\\\mas-0088\\ade"
         },
         {
             "name": "Line2",
             "ip": "10.10.5.55",
             "db": "Makino",
-            "path": "C:\\Users\\eweaver\\Documents\\PythonProjects\\MLTE\\2"
+            "path": "\\\\mas-0111\\ade"
         },
         {
             "name": "Line3",
             "ip": "10.10.5.53",
             "db": "Makino",
-            "path": "C:\\Users\\eweaver\\Documents\\PythonProjects\\MLTE\\3"
+            "path": "\\\\mas-0126\\ade"
         },
         {
             "name": "Line4",
             "ip": "10.10.5.94",
             "db": "Makino",
-            "path": "C:\\Users\\eweaver\\Documents\\PythonProjects\\MLTE\\4"
+            "path": "\\\\mas-0368\\ade"
         },
         {
             "name": "Line5",
             "ip": "192.168.21.77",
             "db": "Makino",
-            "path": "C:\\Users\\eweaver\\Documents\\PythonProjects\\MLTE\\5"
+            "path": "\\\\mas-0357\\ade"
         },
         {
             "name": "5axis",
             "ip": "10.10.5.29",
             "db": "Makino",
-            "path": "C:\\Users\\eweaver\\Documents\\PythonProjects\\MLTE\\6"
+            "path": "\\\\mas-0532\\ade"
         }
     ],
     "endmill_sub_types": {
@@ -267,7 +267,7 @@
                              "lab", "tpi", "chmfr", "assembly", "chmf", "bn", "bastard", "radius", 
                              "rad", "c.r.", "cr", "corner", "bullnose", "chamfer", "chf", "tap", 
                              "lollipop", "thread", "pneumatics", "threading", "debur", "milling cutter",
-                             "chemicals", "boring bars", "drill"]
+                             "chemicals", "boring bars", "drill", "turning"]
         },
         {
             "name": "Ball Mill",
@@ -276,7 +276,7 @@
             "part_exclude": [],
             "word_exclude": ["square", "flat", "tpi", "probe", "sqr", "corner radius", 
                              "c.r.", "corner rounding", "reamer", "bearing", "bearings",
-                             "bur", "moved", "insert", "undercutting"]
+                             "bur", "moved", "insert", "undercutting", "turning"]
         },
         {
             "name": "Bull Mill",
@@ -285,7 +285,7 @@
             "part_exclude": ["screw", "craft", "crane", "creek"],
             "word_exclude": ["ball", "square", "flat", "pilot", "corner rounding", "tpi", "undercutting",
                              "insert", "pneumatics", "debur", "moved", "electrical", "insert", "boring bars",
-                             "reamer", "fixture"]
+                             "reamer", "fixture", "turning"]
         },
         {
             "name": "Drills",
@@ -301,7 +301,7 @@
             "word_include": ["tap", "tapping", "thread tap", "spiral tap", "plug tap", "btm tap", "form tap", "roll form", "sti tap", "sp pt", "sp flt", "exotap"],
             "part_include": [],
             "part_exclude": ["tape", "taper", "tapered"],
-            "word_exclude": ["drill", "thread mill", "tm", "debur"]
+            "word_exclude": ["drill", "thread mill", "tm", "debur", "insert"]
         },
         {
             "name": "Thread Mills",

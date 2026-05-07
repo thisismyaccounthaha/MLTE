@@ -317,7 +317,6 @@ class ToolSearcher:
                 item.get("shadow_brand", ""),
                 item.get("shadow_specs", "")
             ]).lower()
-
             # --- 3. CATEGORY & GEOMETRY FILTERS ---
             if group_meta:
                 match = False
@@ -413,7 +412,7 @@ class ToolSearcher:
                     if not (direct_match or metric_match): continue
                 else:
                     if diff > 0.002: continue
-
+                    
             results.append(item)
 
         return results
@@ -678,10 +677,10 @@ class ToolSearcher:
                 # Determine Refine vs Exclude
                 if key.lower() == 's':
                     mode = "S"
-                    label = 'Refine:'
+                    label = 'Refine'
                 else:
                     mode = "E"
-                    label = 'Exclude:'
+                    label = 'Exclude'
 
                 sys.stdout.write("\033[?25h") # Show cursor for typing
                 sys.stdout.write(f"\n{BAR_COLOR} {label}: {RESET}")
@@ -715,10 +714,20 @@ class ToolSearcher:
                                 str(item.get('descr','')), 
                                 str(item.get('brand','')), 
                                 str(item.get('itemGroupDescr','')), 
-                                str(item.get('itemSubGroupDescr',''))
+                                str(item.get('itemSubGroupDescr','')),
+                                str(item.get("shadow_desc", "")),
+                                str(item.get("shadow_brand", "")),
+                                str(item.get("shadow_specs", ""))
                             ]
+
                             combined_data = self.deep_clean(" ".join(fields))
-                            
+
+        
+                            if item.get('itemNumber','') == "8233":
+                                print("DEBUG ITEM 8233 COMBINED DATA:")
+                                print(combined_data)    
+                                readchar.readkey() # Pause for debugging
+
                             # Perform OR check: match is true if ANY term is found
                             has_match = False
                             for t in search_terms:

@@ -1668,42 +1668,115 @@ def run_item_number_swap(app):
     print("\nPress any key to return...")
     readchar.readkey()
 
-def show_item_specs(app, item_no): # 'app' is now required and first
-    DB_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "database.json")
+def show_item_specs(app, item_no):
+    """
+    Displays full details for a tool, combining warehouse data with 
+    enhanced MSC metadata. Supports toggling extended specs with 'S'.
+    """
+    # Initialize toggle state on the app instance if it doesn't exist
+    if not hasattr(app, 'show_msc_specs'):
+        app.show_msc_specs = False
+
+    # Define file paths
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    DB_FILE = os.path.join(BASE_DIR, "database.json")
+    SHADOW_FILE = os.path.join(BASE_DIR, "shadowdatabase.json") 
     
+    # 1. Load Main Database
     if not os.path.exists(DB_FILE):
         print(f"\n{NUM_CONFLICT} [ERROR] database.json not found. {RESET}")
-        readchar.readkey(); return
+        readchar.readkey()
+        return
 
     with open(DB_FILE, 'r') as f:
         data = json.load(f)
 
+    # 2. Load Shadow Database (MSC Metadata)
+    shadow_data = {}
+    if os.path.exists(SHADOW_FILE):
+        try:
+            with open(SHADOW_FILE, 'r') as f:
+                shadow_data = json.load(f)
+        except Exception:
+            pass
+
+    # 3. Find the specific item in the main database
     item = next((i for i in data if str(i.get('itemNumber')) == str(item_no)), None)
 
     if not item:
         print(f"\n{NUM_CONFLICT} Item {item_no} not found. {RESET}")
-        readchar.readkey(); return
+        readchar.readkey()
+        return
+
+    # 4. Lookup corresponding MSC Shadow entry via Alias (Bridge)
+    alias_raw = str(item.get('itemAliasNumber', '')).strip().split('.')[0]
+    # Check variations of padding to ensure a match with JSON keys
+    shadow_entry = (shadow_data.get(alias_raw) or 
+                    shadow_data.get(alias_raw.zfill(8)) or 
+                    shadow_data.get(alias_raw.zfill(7)))
 
     while True:
         os.system('cls' if os.name == 'nt' else 'clear')
         
-        # Header
+        # --- SECTION 1: CRIB DATA (Warehouse Standard) ---
         print(f"{DESC_COLOR}TOOLCRIB ({item_no}){RESET}")
-        print(f"{BAR_COLOR}" + "—" * 50 + f"{RESET}")
+        print(f"{BAR_COLOR}" + "—" * 60 + f"{RESET}")
         print(f"{BAR_COLOR}[ ITEM DETAILS ]{RESET}\n")
 
-        fields = [
-            ('itemNumber', 'Item Number'), ('descr', 'Description'),
-            ('itemAliasNumber', 'Alias'), ('itemGroupDescr', 'Item Group'),
-            ('itemSubGroupDescr', 'Sub Group'), ('supplierNumber', 'Supplier'),
-            ('supplierPartNumber', 'Supplier Part #'), ('brand', 'Brand')
+        crib_fields = [
+            ('itemNumber', 'Item Number'), 
+            ('descr', 'Description'),
+            ('itemAliasNumber', 'Alias'), 
+            ('itemGroupDescr', 'Item Group'),
+            ('itemSubGroupDescr', 'Sub Group'), 
+            ('supplierNumber', 'Supplier'),
+            ('supplierPartNumber', 'Supplier Part #'), 
+            ('brand', 'Brand')
         ]
 
-        for key_name, label in fields:
+        for key_name, label in crib_fields:
             val = item.get(key_name, 'N/A')
             print(f"{HEAD_COLOR}{label:<18}{RESET}: {val}")
 
-        # --- SEARCH LOGIC ---
+        # --- SECTION 2: MSC DATA (Enhanced Specs) ---
+        if shadow_entry:
+            print(f"\n{SUB_COLOR}" + "—" * 22 + " MSC DATA " + "—" * 28 + f"{RESET}")
+            
+            # Always show the MSC Description if available
+            s_desc = shadow_entry.get('description') or shadow_entry.get('descr') or "N/A"
+            print(f"{DESC_COLOR}{'MSC Description':<18}{RESET}: {s_desc}")
+
+            # If toggle is ON, show the full list of technical specs
+            if app.show_msc_specs:
+                print(f"{SUB_COLOR}" + "—" * 22 + " MSC SPECS " + "—" * 27 + f"{RESET}")
+                
+                # A. Handle the nested 'specs' list (The Scraper Data)
+                raw_specs = shadow_entry.get('specs', [])
+                if isinstance(raw_specs, list):
+                    for spec_item in raw_specs:
+                        if len(spec_item) == 2 and isinstance(spec_item[1], dict):
+                            s_label = spec_item[0]
+                            s_val = spec_item[1].get('value', 'N/A')
+                            print(f"{SUB_COLOR}{s_label:<18}{RESET}: {s_val}")
+
+                # B. Handle any other flat keys in the JSON (excluding metadata/duplicates)
+                ignore = [
+                    'description', 'descr', 'alias', 'specs', 'url', 
+                    'scraped_at', 'originalitemnumber', 'itemnumber', 'brand'
+                ]
+                for k, v in shadow_entry.items():
+                    if k.lower() not in ignore and v:
+                        # Convert camelCase or underscores to Title Case
+                        display_key = k.replace('_', ' ')
+                        display_key = ''.join([' ' + c if c.isupper() and i > 0 else c 
+                                             for i, c in enumerate(display_key)]).strip().title()
+                        print(f"{SUB_COLOR}{display_key:<18}{RESET}: {v}")
+            else:
+                print("")
+        else:
+            print(f"\n{SUB_COLOR}" + "—" * 22 + " NO MSC DATA " + "—" * 25 + f"{RESET}")
+
+        # --- SECTION 3: NAVIGATION FOOTER ---
         supplier = str(item.get('supplierNumber', '')).lower()
         alias = item.get('itemAliasNumber')
         brand = item.get('brand', '')
@@ -1712,23 +1785,25 @@ def show_item_specs(app, item_no): # 'app' is now required and first
         can_open_msc = "msc" in supplier and alias
         can_google = not can_open_msc and (brand or part_no)
 
-        # Footer Menu
-        print("\n" + f"{SUB_COLOR}—{RESET}" * 50)
-        
-        # The 'F' key is now always functional because 'app' is guaranteed
-        print(f"{BAR_COLOR}[ F ]{RESET} {HEAD_COLOR}Find Functional Tools (FTN){RESET}")
+        print("\n" + f"{BAR_COLOR}" + "—" * 60 + f"{RESET}")
+        print(f"{BAR_COLOR}[ F ]{RESET} {HEAD_COLOR}Find FTN{RESET}   {BAR_COLOR}[ S ]{RESET} {HEAD_COLOR}Toggle MSC Specs{RESET}")
 
         if can_open_msc:
             print(f"{BAR_COLOR}[ SPACE ]{RESET} Open MSC Webpage")
         elif can_google:
-            print(f"{BAR_COLOR}[ SPACE ]{RESET} Search Google for {brand} {part_no}")
+            print(f"{BAR_COLOR}[ SPACE ]{RESET} Search Google")
         
         print(f"{SUB_COLOR}[ ANY OTHER KEY ]{RESET} Return to Search")
 
-        # Handle Input
+        # Handle User Input
         key = readchar.readkey()
         
-        if key.lower() == 'f':
+        if key.lower() == 's':
+            app.show_msc_specs = not app.show_msc_specs
+            continue # Refreshes display loop
+
+        elif key.lower() == 'f':
+            # This triggers the functional tool search logic
             run_item_search(app, initial_item=item_no)
             continue 
 
@@ -1741,6 +1816,7 @@ def show_item_specs(app, item_no): # 'app' is now required and first
             continue
             
         else:
+            # Exit loop to return to the search list
             break
 
 def search_tool_crib(app, initial_query=None):
